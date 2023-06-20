@@ -6,13 +6,33 @@
 
 CLI to transform text files recursively
 
+## Install
+
+### [Option 1] Install from the PyPI
+
+Caveat: an old version could be installed.
+
+```
+pip install recurtx
+```
+
+### [Option 2] Install with editable option
+
+This is recommended if you want to use the latest version and/or modify the source code.
+
+```bash
+git clone https://github.com/Minyus/recurtx.git
+cd recurtx
+pip install -e .
+```
+
 ## Commands
 
 ### recurtx under
 
 Run any command for each file under a directory recursively.
 
-#### Example
+#### Examples
 
 Run `wc -l {FILEPATH}` for each file under `directory_foo` recursively:
 
@@ -20,7 +40,16 @@ Run `wc -l {FILEPATH}` for each file under `directory_foo` recursively:
 recurtx under directory_foo "wc -l"
 ```
 
-#### recurtx under --help
+Quoting for the script can be omitted for most cases. 
+
+```
+recurtx under directory_foo wc -l
+```
+
+Caveat: int, float, tuple, list, dict could be formatted unexpectedly (by `fire` package), for example:
+- ` 00 ` (recognized as int by Python) will be converted to ` 0 ` while ` "00" ` (recognized as str by Python) will be kept as is
+
+#### Description
 
 ```
 NAME
@@ -36,18 +65,21 @@ POSITIONAL ARGUMENTS
         Type: str
 
 FLAGS
-    -g, --glob=GLOB
+    --glob=GLOB
         Type: str
         Default: '**/*'
-    -r, --replace_str=REPLACE_STR
+    --replace_str=REPLACE_STR
         Type: str
         Default: '@@'
-    -a, --append_missing_replace_str=APPEND_MISSING_REPLACE_STR
+    --append_missing_replace_str=APPEND_MISSING_REPLACE_STR
         Type: bool
         Default: True
-    -v, --verbose=VERBOSE
-        Type: int
-        Default: 1
+    --show_paths=SHOW_PATHS
+        Type: bool
+        Default: False
+    --show_scripts=SHOW_SCRIPTS
+        Type: bool
+        Default: False
 
 NOTES
     You can also use flags syntax for POSITIONAL ARGUMENTS
@@ -57,7 +89,7 @@ NOTES
 
 Search a keyword in a file.
 
-#### Example
+#### Examples
 
 Search `keyword_bar` in each file under `directory_foo` recursively:
 
@@ -65,7 +97,13 @@ Search `keyword_bar` in each file under `directory_foo` recursively:
 recurtx under directory_foo recurtx search keyword_bar
 ```
 
-#### recurtx search --help
+Search `keyword_bar` and substitute (replace) with `keyword_baz` in each file under `directory_foo` recursively:
+
+```
+recurtx under directory_foo recurtx search keyword_bar --sub keyword_baz
+```
+
+#### Description
 
 ```
 NAME

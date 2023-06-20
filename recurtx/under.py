@@ -1,20 +1,36 @@
 from pathlib import Path
 
-from .utils import subprocess_run, upath
+from .utils import subprocess_run, upath, get_exception_msg
 
 
 def under(
     path: str,
     *scripts: str,
-    glob: str = "**/*",
-    replace_str: str = "@@",
-    append_missing_replace_str: bool = True,
-    verbose: int = 1,
+    **kwargs: str,
 ):
+    glob = kwargs.pop("glob", "**/*")
+    replace_str = kwargs.pop("replace_str", "@@")
+    append_missing_replace_str = kwargs.pop("append_missing_replace_str", True)
+    show_paths = kwargs.pop("show_paths", False)
+    show_scripts = kwargs.pop("show_scripts", False)
+
     scripts = list(scripts)
+    if len(kwargs) and len(scripts) == 1:
+        scripts = scripts[0].split(" ")
+    for k, v in kwargs.items():
+        if isinstance(v, bool) and v == False:
+            continue
+        if len(k) >= 2:
+            scripts.append("--" + k)
+        elif len(k) == 1:
+            scripts.append("-" + k)
+        else:
+            raise NotImplementedError()
+        if isinstance(v, bool):
+            continue
+        scripts.append(str(v))
+
     if not scripts:
-        if verbose >= 2:
-            print("scripts was not provided.")
         scripts = ["echo"]
 
     if append_missing_replace_str and all(
@@ -32,7 +48,7 @@ def under(
         path_ls = [path]
     else:
         path_ls = [p for p in path.glob(glob) if p.is_file()]
-    if verbose >= 3:
+    if show_paths:
         print(
             "[Searching files]\n" + str("\n".join(["    " + str(p) for p in path_ls]))
         )
@@ -44,8 +60,8 @@ def under(
             ]
             if len(running_scripts) == 1:
                 running_scripts = running_scripts[0]
-            subprocess_run(running_scripts, verbose >= 2)
+            subprocess_run(running_scripts, show_scripts)
         except Exception:
-            if verbose >= 3:
-                raise
+            msg = get_exception_msg()
+            print(msg)
             continue

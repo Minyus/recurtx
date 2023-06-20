@@ -1,5 +1,11 @@
 from pathlib import Path
 from typing import List, Union
+import sys
+import traceback
+
+
+def get_exception_msg():
+    return "".join(traceback.format_exception(*sys.exc_info()))
 
 
 def upath(
