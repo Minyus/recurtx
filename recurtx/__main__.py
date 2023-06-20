@@ -1,7 +1,7 @@
 import fire
 
 from .search import search
-from .under import batch, under
+from .recur import batch, under
 
 
 def main():
