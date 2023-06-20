@@ -1,9 +1,10 @@
 from pathlib import Path
 
-from .utils import subprocess_run, upath, get_exception_msg
+from .utils import get_exception_msg, subprocess_run, upath
 
 
-def under(
+def recur(
+    kind: str,
     path: str,
     *scripts: str,
     **kwargs: str,
@@ -42,26 +43,69 @@ def under(
             scripts[0] += " " + replace_str
 
     path = Path(upath(path))
-    assert path.exists(), path
+    assert path.exists(), str(path.resolve()) + " does not exist."
 
     if path.is_file():
-        path_ls = [path]
+        path_ls = [str(path)]
     else:
-        path_ls = [p for p in path.glob(glob) if p.is_file()]
+        path_ls = [str(p) for p in path.glob(glob) if p.is_file()]
     if show_paths:
-        print(
-            "[Searching files]\n" + str("\n".join(["    " + str(p) for p in path_ls]))
-        )
+        print("[Searching files]\n" + str("\n".join(["    " + p for p in path_ls])))
 
-    for p in path_ls:
+    if kind == "under":
+        for p in path_ls:
+            try:
+                running_scripts = [script.replace(replace_str, p) for script in scripts]
+                if len(running_scripts) == 1:
+                    running_scripts = running_scripts[0]
+                subprocess_run(running_scripts, show_scripts)
+            except Exception:
+                msg = get_exception_msg()
+                print(msg)
+                continue
+
+    elif kind == "batch":
+        if len(scripts) == 1:
+            running_scripts = scripts[0].replace(replace_str, " ".join(path_ls))
+        else:
+            running_scripts = []
+            for script in scripts:
+                if script == replace_str:
+                    running_scripts.extend(path_ls)
+                else:
+                    running_scripts.append(script)
         try:
-            running_scripts = [
-                script.replace(replace_str, str(p)) for script in scripts
-            ]
-            if len(running_scripts) == 1:
-                running_scripts = running_scripts[0]
             subprocess_run(running_scripts, show_scripts)
         except Exception:
             msg = get_exception_msg()
             print(msg)
-            continue
+    else:
+        raise NotImplementedError()
+
+
+def under(
+    path: str,
+    *scripts: str,
+    **kwargs: str,
+):
+    kind = "under"
+    recur(
+        kind,
+        path,
+        *scripts,
+        **kwargs,
+    )
+
+
+def batch(
+    path: str,
+    *scripts: str,
+    **kwargs: str,
+):
+    kind = "batch"
+    recur(
+        kind,
+        path,
+        *scripts,
+        **kwargs,
+    )

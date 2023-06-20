@@ -1,7 +1,7 @@
-from pathlib import Path
-from typing import List, Union
 import sys
 import traceback
+from pathlib import Path
+from typing import List, Union
 
 
 def get_exception_msg():
