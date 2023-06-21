@@ -17,18 +17,47 @@ def csv(
     kwargs.pop("method", None)
     kwargs.pop("write_path", None)
 
-    if package == "pandas":
-        import pandas as pd
+    if package == "polars":
+        import polars as pl
 
-        kwargs.setdefault("dtype", str)
-        kwargs.setdefault("keep_default_na", False)
-    elif package == "modin":
+        ls = []
+        for path in paths:
+            df = pl.scan_csv(path, **kwargs)
+            ls.append(df)
+
+        df = pl.concat(ls)
+
+        if method is not None:
+            df = eval("df." + method)
+            df = df.collect()
+            if not isinstance(df, pl.DataFrame):
+                text = "{}".format(df)
+                if write_path:
+                    Path(write_path).write_text(text)
+                else:
+                    print(text)
+                return
+
+        df = df.collect()
+
+        if write_path:
+            df.write_csv(write_path)
+        else:
+            print(df.write_csv())
+        return
+
+    if package == "modin":
         import modin.pandas as pd
-    elif package == "polars":
-        import polars as pd
+    elif package == "pandas":
+        import pandas as pd
     else:
-        raise NotImplementedError()
+        raise NotImplementedError(
+            "'" + package + "' not supported. Set one of ['pandas', 'modin', 'polars']"
+        )
     import numpy as np
+
+    kwargs.setdefault("dtype", str)
+    kwargs.setdefault("keep_default_na", False)
 
     ls = []
     for path in paths:
@@ -37,9 +66,9 @@ def csv(
             df = df.query(query)
         ls.append(df)
 
-    df = pd.concat(ls)
+    df = pd.concat(ls, ignore_index=True)
 
-    if method:
+    if method is not None:
         df = eval("df." + method)
         if not isinstance(df, pd.DataFrame):
             text = "{}".format(df)
@@ -50,12 +79,6 @@ def csv(
             return
 
     if write_path:
-        if package == "polars":
-            df.write_csv(write_path)
-        else:
-            df.to_csv(write_path, index=False)
+        df.to_csv(write_path, index=False)
     else:
-        if package == "polars":
-            print(df.write_csv())
-        else:
-            print(df.to_csv(index=False))
+        print(df.to_csv(index=False))
