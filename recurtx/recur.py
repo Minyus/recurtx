@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 from .utils import get_exception_msg, subprocess_run, upath
@@ -50,7 +51,7 @@ def recur(
     else:
         path_ls = [str(p) for p in path.glob(glob) if p.is_file()]
     if show_paths:
-        print("[Searching files]\n" + str("\n".join(["    " + p for p in path_ls])))
+        sys.stdout.write("[Searching files]\n" + str("\n".join(["    " + p for p in path_ls])))
 
     if kind == "under":
         for p in path_ls:
@@ -61,7 +62,7 @@ def recur(
                 subprocess_run(running_scripts, show_scripts)
             except Exception:
                 msg = get_exception_msg()
-                print(msg)
+                sys.stdout.write(msg)
                 continue
 
     elif kind == "batch":
@@ -78,7 +79,7 @@ def recur(
             subprocess_run(running_scripts, show_scripts)
         except Exception:
             msg = get_exception_msg()
-            print(msg)
+            sys.stdout.write(msg)
     else:
         raise NotImplementedError()
 

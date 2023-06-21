@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 
@@ -35,7 +36,7 @@ def csv(
                 if write_path:
                     Path(write_path).write_text(text)
                 else:
-                    print(text)
+                    sys.stdout.write(text)
                 return
 
         df = df.collect()
@@ -43,7 +44,7 @@ def csv(
         if write_path:
             df.write_csv(write_path)
         else:
-            print(df.write_csv())
+            sys.stdout.write(df.write_csv())
         return
 
     if package == "modin":
@@ -75,10 +76,10 @@ def csv(
             if write_path:
                 Path(write_path).write_text(text)
             else:
-                print(text)
+                sys.stdout.write(text)
             return
 
     if write_path:
         df.to_csv(write_path, index=False)
     else:
-        print(df.to_csv(index=False))
+        sys.stdout.write(df.to_csv(index=False))

@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 
 
 def search(
@@ -38,7 +39,7 @@ def search(
                 replacing = text[start_index:end_index]
                 replacing_ls.append(replacing)
             if verbose >= 1:
-                print(
+                sys.stdout.write(
                     f"{p} [{start_index}:{end_index}]\n{text[start_index:end_index]}\n"
                 )
         else:
