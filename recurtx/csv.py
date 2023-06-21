@@ -6,6 +6,9 @@ def csv(
     *paths: str,
     package: str = "pandas",
     query: str = None,
+    head: int = None,
+    tail: int = None,
+    sample: int = None,
     method: str = None,
     write_path: str = None,
     **kwargs,
@@ -15,6 +18,9 @@ def csv(
     """Workaround for unexpected behavior of Fire"""
     kwargs.pop("package", None)
     kwargs.pop("query", None)
+    kwargs.pop("head", None)
+    kwargs.pop("tail", None)
+    kwargs.pop("sample", None)
     kwargs.pop("method", None)
     kwargs.pop("write_path", None)
 
@@ -27,6 +33,19 @@ def csv(
             ls.append(df)
 
         df = pl.concat(ls)
+
+        subset_ls = []
+        if head is not None:
+            subset_ls.append(df.head(head))
+        if tail is not None:
+            subset_ls.append(df.tail(tail))
+        if subset_ls:
+            df = pl.concat(subset_ls)
+
+        if sample is not None:
+            df = df.collect()
+            df = df.sample(sample)
+            df = df.lazy()
 
         if method is not None:
             df = eval("df." + method)
@@ -68,6 +87,17 @@ def csv(
         ls.append(df)
 
     df = pd.concat(ls, ignore_index=True)
+
+    subset_ls = []
+    if head is not None:
+        subset_ls.append(df.head(head))
+    if tail is not None:
+        subset_ls.append(df.tail(tail))
+    if subset_ls:
+        df = pd.concat(subset_ls, ignore_index=True)
+
+    if sample is not None:
+        df = df.sample(sample)
 
     if method is not None:
         df = eval("df." + method)
