@@ -3,19 +3,29 @@ from pathlib import Path
 
 def csv(
     *paths: str,
-    backend: str = "pandas",
+    package: str = "pandas",
     query: str = None,
     method: str = None,
     write_path: str = None,
     **kwargs,
 ):
-    kwargs.setdefault("dtype", str)
-    kwargs.setdefault("keep_default_na", False)
+    """CSV file transformation using pandas, modin, or polars package specified by package arg"""
 
-    if backend == "modin":
-        import modin.pandas as pd
-    elif backend == "pandas":
+    """Workaround for unexpected behavior of Fire"""
+    kwargs.pop("package", None)
+    kwargs.pop("query", None)
+    kwargs.pop("method", None)
+    kwargs.pop("write_path", None)
+
+    if package == "pandas":
         import pandas as pd
+
+        kwargs.setdefault("dtype", str)
+        kwargs.setdefault("keep_default_na", False)
+    elif package == "modin":
+        import modin.pandas as pd
+    elif package == "polars":
+        import polars as pd
     else:
         raise NotImplementedError()
     import numpy as np
@@ -40,6 +50,12 @@ def csv(
             return
 
     if write_path:
-        df.to_csv(write_path, index=False)
+        if package == "polars":
+            df.write_csv(write_path)
+        else:
+            df.to_csv(write_path, index=False)
     else:
-        print(df.to_csv(index=False))
+        if package == "polars":
+            print(df.write_csv())
+        else:
+            print(df.to_csv(index=False))
