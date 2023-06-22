@@ -52,19 +52,21 @@ def polars(
 
     streaming = streaming in {"", "True", "true", "T", "t", "1"}
 
+    if read_type is not None:
+        assert read_type in DATA_TYPES, (
+            str(read_type) + "not in the supported list: " + str(DATA_TYPES)
+        )
+
     import polars as pl
 
     ls = []
     for path in paths:
         if read_type is None:
             _read_type = path.split(".")[-1].replace("jsonl", "ndjson")
-            if _read_type not in DATA_TYPES:
-                continue
         else:
-            assert read_type in DATA_TYPES, (
-                read_type + "not in the supported list: " + str(DATA_TYPES)
-            )
             _read_type = read_type
+        if _read_type not in DATA_TYPES:
+            continue
         read_func = getattr(pl, "scan_" + _read_type, None)
         if read_func is None:
             read_func = getattr(pl, "read_" + _read_type)
