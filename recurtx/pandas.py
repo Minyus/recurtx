@@ -1,6 +1,29 @@
 import sys
 from pathlib import Path
 
+DATA_TYPES = {
+    "pickle",
+    "table",
+    "csv",
+    "fwf",
+    "clipboard",
+    "excel",
+    "json",
+    "html",
+    "xml",
+    "hdf",
+    "feather",
+    "parquet",
+    "orc",
+    "sas",
+    "spss",
+    "sql_table",
+    "sql_query",
+    "sql",
+    "gbq",
+    "stata",
+}
+
 
 def pandas(
     *paths: str,
@@ -39,7 +62,12 @@ def pandas(
     for path in paths:
         if read_type is None:
             _read_type = path.split(".")[-1]
+            if _read_type not in DATA_TYPES:
+                continue
         else:
+            assert read_type in DATA_TYPES, (
+                read_type + "not in the supported list: " + str(DATA_TYPES)
+            )
             _read_type = read_type
         read_func = getattr(pd, "read_" + _read_type)
         _kwargs = kwargs.copy()
@@ -51,7 +79,12 @@ def pandas(
             df = df.query(query)
         ls.append(df)
 
-    df = pd.concat(ls, ignore_index=True)
+    if not ls:
+        return
+    elif len(ls) == 1:
+        df = ls[0]
+    else:
+        df = pd.concat(ls, ignore_index=True)
 
     subset_ls = []
     if head is not None:

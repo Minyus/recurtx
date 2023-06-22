@@ -1,6 +1,18 @@
 import sys
 from pathlib import Path
 
+DATA_TYPES = {
+    "csv",
+    "ipc",
+    "parquet",
+    "database",
+    "json",
+    "ndjson",
+    "avro",
+    "excel",
+    "delta",
+}
+
 
 def activate(
     df,
@@ -45,8 +57,13 @@ def polars(
     ls = []
     for path in paths:
         if read_type is None:
-            _read_type = path.split(".")[-1]
+            _read_type = path.split(".")[-1].replace("jsonl", "ndjson")
+            if _read_type not in DATA_TYPES:
+                continue
         else:
+            assert read_type in DATA_TYPES, (
+                read_type + "not in the supported list: " + str(DATA_TYPES)
+            )
             _read_type = read_type
         read_func = getattr(pl, "scan_" + _read_type, None)
         if read_func is None:
@@ -56,7 +73,12 @@ def polars(
             df = read_func(path, **kwargs)
         ls.append(df)
 
-    df = pl.concat(ls)
+    if not ls:
+        return
+    elif len(ls) == 1:
+        df = ls[0]
+    else:
+        df = pl.concat(ls)
 
     subset_ls = []
     if head is not None:
