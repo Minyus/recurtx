@@ -51,7 +51,9 @@ def recur(
     else:
         path_ls = [str(p) for p in path.glob(glob) if p.is_file()]
     if show_paths:
-        sys.stdout.write("[Searching files]\n" + str("\n".join(["    " + p for p in path_ls])))
+        sys.stdout.write(
+            "[Searching files]\n" + str("\n".join(["    " + p for p in path_ls]))
+        )
 
     if kind == "under":
         for p in path_ls:
