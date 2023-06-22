@@ -5,6 +5,7 @@ from pathlib import Path
 def pandas(
     *paths: str,
     package: str = "pandas",
+    read_type: str = None,
     query: str = None,
     head: int = None,
     tail: int = None,
@@ -34,12 +35,18 @@ def pandas(
         )
     import numpy as np
 
-    kwargs.setdefault("dtype", str)
-    kwargs.setdefault("keep_default_na", False)
-
     ls = []
     for path in paths:
-        df = pd.read_csv(path, **kwargs)
+        if read_type is None:
+            _read_type = path.split(".")[-1]
+        else:
+            _read_type = read_type
+        read_func = getattr(pd, "read_" + _read_type)
+        _kwargs = kwargs.copy()
+        if read_type == "csv":
+            _kwargs.setdefault("dtype", str)
+            _kwargs.setdefault("keep_default_na", False)
+        df = read_func(path, **_kwargs)
         if query:
             df = df.query(query)
         ls.append(df)

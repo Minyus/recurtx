@@ -17,6 +17,7 @@ def activate(
 
 def polars(
     *paths: str,
+    read_type: str = None,
     streaming: str = None,  # actually bool
     fetch: int = None,
     head: int = None,
@@ -43,7 +44,16 @@ def polars(
 
     ls = []
     for path in paths:
-        df = pl.scan_csv(path, **kwargs)
+        if read_type is None:
+            _read_type = path.split(".")[-1]
+        else:
+            _read_type = read_type
+        read_func = getattr(pl, "scan_" + _read_type, None)
+        if read_func is None:
+            read_func = getattr(pl, "read_" + _read_type)
+            df = read_func(path, **kwargs).lazy()
+        else:
+            df = read_func(path, **kwargs)
         ls.append(df)
 
     df = pl.concat(ls)
