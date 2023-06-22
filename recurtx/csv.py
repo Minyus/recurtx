@@ -2,9 +2,24 @@ import sys
 from pathlib import Path
 
 
+def activate(
+    df,
+    fetch: int = None,
+    streaming: bool = None,
+):
+    df = (
+        df.fetch(n_rows=fetch, streaming=streaming)
+        if fetch
+        else df.collect(streaming=streaming)
+    )
+    return df
+
+
 def csv(
     *paths: str,
     package: str = "pandas",
+    streaming: str = None,  # actually bool
+    fetch: int = None,
     query: str = None,
     head: int = None,
     tail: int = None,
@@ -17,12 +32,16 @@ def csv(
 
     """Workaround for unexpected behavior of Fire"""
     kwargs.pop("package", None)
+    kwargs.pop("streaming", None)
+    kwargs.pop("fetch", None)
     kwargs.pop("query", None)
     kwargs.pop("head", None)
     kwargs.pop("tail", None)
     kwargs.pop("sample", None)
     kwargs.pop("method", None)
     kwargs.pop("write_path", None)
+
+    streaming = streaming in {"", "True", "true", "T", "t", "1"}
 
     if package == "polars":
         import polars as pl
@@ -43,13 +62,13 @@ def csv(
             df = pl.concat(subset_ls)
 
         if sample is not None:
-            df = df.collect()
+            df = activate(df, fetch, streaming)
             df = df.sample(sample)
             df = df.lazy()
 
         if method is not None:
             df = eval("df." + method)
-            df = df.collect()
+            df = activate(df, fetch, streaming)
             if not isinstance(df, pl.DataFrame):
                 text = "{}".format(df)
                 if write_path:
@@ -58,7 +77,7 @@ def csv(
                     sys.stdout.write(text)
                 return
 
-        df = df.collect()
+        df = activate(df, fetch, streaming)
 
         if write_path:
             df.write_csv(write_path)
