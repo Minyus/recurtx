@@ -66,13 +66,14 @@ def pandas(
 
     if method is not None:
         df = eval("df." + method)
-        if not isinstance(df, pd.DataFrame):
-            text = "{}".format(df)
-            if write_path:
-                Path(write_path).write_text(text)
-            else:
-                sys.stdout.write(text)
-            return
+
+    if not isinstance(df, pd.DataFrame):
+        text = "{}".format(df)
+        if write_path:
+            Path(write_path).write_text(text)
+        else:
+            sys.stdout.write(text)
+        return
 
     if write_path:
         df.to_csv(write_path, index=False)

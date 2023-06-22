@@ -73,16 +73,16 @@ def polars(
 
     if method is not None:
         df = eval("df." + method)
-        df = activate(df, fetch, streaming)
-        if not isinstance(df, pl.DataFrame):
-            text = "{}".format(df)
-            if write_path:
-                Path(write_path).write_text(text)
-            else:
-                sys.stdout.write(text)
-            return
 
     df = activate(df, fetch, streaming)
+
+    if not isinstance(df, pl.DataFrame):
+        text = "{}".format(df)
+        if write_path:
+            Path(write_path).write_text(text)
+        else:
+            sys.stdout.write(text)
+        return
 
     if write_path:
         df.write_csv(write_path)
