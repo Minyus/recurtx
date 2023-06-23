@@ -13,7 +13,6 @@ def recur(
     glob = kwargs.pop("glob", "**/*")
     reverse = kwargs.pop("reverse", False)
     replace_str = kwargs.pop("replace_str", "@@")
-    append_missing_replace_str = kwargs.pop("append_missing_replace_str", True)
     show_paths = kwargs.pop("show_paths", False)
     show_scripts = kwargs.pop("show_scripts", False)
 
@@ -36,9 +35,7 @@ def recur(
     if not scripts:
         scripts = ["echo"]
 
-    if append_missing_replace_str and all(
-        [replace_str not in script for script in scripts]
-    ):
+    if replace_str and all([replace_str not in script for script in scripts]):
         if len(scripts) >= 2:
             scripts.append(replace_str)
         else:
@@ -54,13 +51,17 @@ def recur(
         path_ls.sort(reverse=reverse)
     if show_paths:
         sys.stdout.write(
-            "[Searching files]\n" + str("\n".join(["    " + p for p in path_ls]))
+            "[Searching files]\n" + str("\n".join(["    " + p for p in path_ls]) + "\n")
         )
 
+    running_scripts = scripts
     if kind == "under":
         for p in path_ls:
             try:
-                running_scripts = [script.replace(replace_str, p) for script in scripts]
+                if replace_str:
+                    running_scripts = [
+                        script.replace(replace_str, p) for script in scripts
+                    ]
                 if len(running_scripts) == 1:
                     running_scripts = running_scripts[0]
                 subprocess_run(running_scripts, show_scripts)
@@ -71,11 +72,15 @@ def recur(
 
     elif kind == "batch":
         if len(scripts) == 1:
-            running_scripts = scripts[0].replace(replace_str, " ".join(path_ls))
+            running_scripts = scripts[0]
+            if replace_str:
+                running_scripts = running_scripts.replace(
+                    replace_str, " ".join(path_ls)
+                )
         else:
             running_scripts = []
             for script in scripts:
-                if script == replace_str:
+                if replace_str and (script == replace_str):
                     running_scripts.extend(path_ls)
                 else:
                     running_scripts.append(script)
