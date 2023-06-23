@@ -11,6 +11,7 @@ def recur(
     **kwargs: str,
 ):
     glob = kwargs.pop("glob", "**/*")
+    reverse = kwargs.pop("reverse", False)
     replace_str = kwargs.pop("replace_str", "@@")
     append_missing_replace_str = kwargs.pop("append_missing_replace_str", True)
     show_paths = kwargs.pop("show_paths", False)
@@ -50,6 +51,7 @@ def recur(
         path_ls = [str(path)]
     else:
         path_ls = [str(p) for p in path.glob(glob) if p.is_file()]
+        path_ls.sort(reverse=reverse)
     if show_paths:
         sys.stdout.write(
             "[Searching files]\n" + str("\n".join(["    " + p for p in path_ls]))
