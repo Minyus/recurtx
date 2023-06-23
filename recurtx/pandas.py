@@ -116,20 +116,46 @@ def pandas(
     elif merge is not None:
         df = ls[0]
         for right_df in ls[1:]:
-            df = df.merge(
-                right_df,
-                on=on,
-                how=merge,
-                left_on=left_on,
-                right_on=right_on,
-                left_index=left_index,
-                right_index=right_index,
-                sort=sort,
-                suffixes=suffixes,
-                copy=copy,
-                indicator=indicator,
-                validate=validate,
-            )
+            if merge == "anti":
+                cols = df.columns
+                df = (
+                    df.reset_index()
+                    .merge(
+                        right_df,
+                        on=on,
+                        how="left",
+                        left_on=left_on,
+                        right_on=right_on,
+                        left_index=left_index,
+                        right_index=right_index,
+                        sort=sort,
+                        suffixes=suffixes,
+                        copy=copy,
+                        indicator=True,
+                        validate=validate,
+                    )
+                    .set_index("index")
+                )
+                df = df.query('_merge == "left_only"')[cols]
+            else:
+                df = (
+                    df.reset_index()
+                    .merge(
+                        right_df,
+                        on=on,
+                        how=merge,
+                        left_on=left_on,
+                        right_on=right_on,
+                        left_index=left_index,
+                        right_index=right_index,
+                        sort=sort,
+                        suffixes=suffixes,
+                        copy=copy,
+                        indicator=indicator,
+                        validate=validate,
+                    )
+                    .set_index("index")
+                )
     elif join is not None:
         df = ls[0]
         for right_df in ls[1:]:
