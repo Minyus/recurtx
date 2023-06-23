@@ -32,6 +32,12 @@ def polars(
     read_type: str = None,
     streaming: str = None,  # actually bool
     fetch: int = None,
+    join: str = None,
+    on: str = None,
+    left_on: str = None,
+    right_on: str = None,
+    suffix: str = "_right",
+    validate: str = "m:m",
     head: int = None,
     tail: int = None,
     sample: int = None,
@@ -44,6 +50,12 @@ def polars(
     """Workaround for unexpected behavior of Fire"""
     kwargs.pop("streaming", None)
     kwargs.pop("fetch", None)
+    kwargs.pop("join", None)
+    kwargs.pop("on", None)
+    kwargs.pop("left_on", None)
+    kwargs.pop("right_on", None)
+    kwargs.pop("suffix", "_right")
+    kwargs.pop("validate", "m:m")
     kwargs.pop("head", None)
     kwargs.pop("tail", None)
     kwargs.pop("sample", None)
@@ -79,6 +91,18 @@ def polars(
         return
     elif len(ls) == 1:
         df = ls[0]
+    elif join is not None:
+        df = ls[0]
+        for right_df in ls[1:]:
+            df = df.join(
+                right_df,
+                on=on,
+                how=join,
+                left_on=left_on,
+                right_on=right_on,
+                suffix=suffix,
+                validate=validate,
+            )
     else:
         df = pl.concat(ls)
 

@@ -29,6 +29,20 @@ def pandas(
     *paths: str,
     package: str = "pandas",
     read_type: str = None,
+    join: str = None,
+    merge: str = None,
+    on: str = None,
+    left_on: str = None,
+    right_on: str = None,
+    left_index: bool = False,
+    right_index: bool = False,
+    sort: bool = False,
+    suffixes: str = ("_x", "_y"),
+    copy: bool = True,
+    indicator: bool = False,
+    validate: str = None,
+    lsuffix: str = None,
+    rsuffix: str = None,
     query: str = None,
     head: int = None,
     tail: int = None,
@@ -41,6 +55,20 @@ def pandas(
 
     """Workaround for unexpected behavior of Fire"""
     kwargs.pop("package", None)
+    kwargs.pop("join", None)
+    kwargs.pop("merge", None)
+    kwargs.pop("on", None)
+    kwargs.pop("left_on", None)
+    kwargs.pop("right_on", None)
+    kwargs.pop("left_index", False)
+    kwargs.pop("right_index", False)
+    kwargs.pop("sort", False)
+    kwargs.pop("suffixes", ("_x", "_y"))
+    kwargs.pop("copy", True)
+    kwargs.pop("indicator", False)
+    kwargs.pop("validate", None)
+    kwargs.pop("lsuffix", "")
+    kwargs.pop("rsuffix", "")
     kwargs.pop("query", None)
     kwargs.pop("head", None)
     kwargs.pop("tail", None)
@@ -85,6 +113,35 @@ def pandas(
         return
     elif len(ls) == 1:
         df = ls[0]
+    elif merge is not None:
+        df = ls[0]
+        for right_df in ls[1:]:
+            df = df.merge(
+                right_df,
+                on=on,
+                how=merge,
+                left_on=left_on,
+                right_on=right_on,
+                left_index=left_index,
+                right_index=right_index,
+                sort=sort,
+                suffixes=suffixes,
+                copy=copy,
+                indicator=indicator,
+                validate=validate,
+            )
+    elif join is not None:
+        df = ls[0]
+        for right_df in ls[1:]:
+            df = df.join(
+                right_df,
+                on=on,
+                how=join,
+                lsuffix=lsuffix,
+                rsuffix=rsuffix,
+                sort=sort,
+                validate=validate,
+            )
     else:
         df = pd.concat(ls, ignore_index=True)
 
