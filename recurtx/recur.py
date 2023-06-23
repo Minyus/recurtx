@@ -98,6 +98,8 @@ def under(
     *scripts: str,
     **kwargs: str,
 ):
+    """Run any scripts for each file under a directory recursively."""
+
     kind = "under"
     recur(
         kind,
@@ -112,6 +114,8 @@ def batch(
     *scripts: str,
     **kwargs: str,
 ):
+    """Run any scripts for a batch of files in a directory recursively."""
+
     kind = "batch"
     recur(
         kind,

@@ -9,6 +9,8 @@ def find(
     wildcard: str = "*",
     verbose: int = 1,
 ):
+    """Find a keyword, which may include wildcards, in the file path, and optionally substitute (replace)."""
+
     target_ls = eval("'''" + target + "'''").split(wildcard)
 
     text = path

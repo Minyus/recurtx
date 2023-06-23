@@ -45,7 +45,7 @@ def polars(
     write_path: str = None,
     **kwargs,
 ):
-    """file transformation using polars package"""
+    """Read and transform tabular files using polars."""
 
     """Workaround for unexpected behavior of Fire"""
     kwargs.pop("streaming", None)

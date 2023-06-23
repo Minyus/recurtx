@@ -51,7 +51,7 @@ def pandas(
     write_path: str = None,
     **kwargs,
 ):
-    """file transformation using pandas package"""
+    """Read and transform tabular files using pandas."""
 
     """Workaround for unexpected behavior of Fire"""
     kwargs.pop("package", None)
