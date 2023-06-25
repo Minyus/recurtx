@@ -222,7 +222,23 @@ def pandas(
         if _write_type not in (DATA_TYPES.union({"markdown"})):
             _write_type = "csv"
 
-    write_func = getattr(df, "to_" + _write_type)
+    _write_func = getattr(df, "to_" + _write_type)
+
+    def write_func(write_path: str = None, index=False):
+        nonlocal _write_func, df
+        try:
+            if _write_type == "json":
+                import json
+
+                ls = df.to_dict(orient="records")
+                if write_path:
+                    json.dump(ls, write_path)
+                else:
+                    return json.dumps(ls)
+            return _write_func(write_path, index=index)
+        except:
+            return _write_func(write_path)
+
     if write_path:
         write_func(write_path, index=False)
     else:
