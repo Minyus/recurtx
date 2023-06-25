@@ -1,6 +1,14 @@
 from setuptools import find_packages, setup
 
-entry_point = "recurtx = recurtx.__main__:main"
+console_scripts = [
+    "recurtx = recurtx.__main__:main",
+    "xpandas = recurtx.__main__:xpandas",
+    "xpolars = recurtx.__main__:xpolars",
+    "xunder = recurtx.__main__:xunder",
+    "xbatch = recurtx.__main__:xbatch",
+    "xsearch = recurtx.__main__:xsearch",
+    "xfind = recurtx.__main__:xfind",
+]
 
 
 with open("requirements.txt", encoding="utf-8") as f:
@@ -19,7 +27,7 @@ setup(
     name="recurtx",
     version="0.0.3",
     packages=find_packages(exclude=["tests"]),
-    entry_points={"console_scripts": [entry_point]},
+    entry_points={"console_scripts": console_scripts},
     install_requires=requires,
     description="CLI to transform text files recursively",
     license="Apache Software License (Apache 2.0)",
