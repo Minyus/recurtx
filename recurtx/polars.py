@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 from typing import List
 
-from .utils import stdout_lines
+from .utils import infer_type, stdout_lines
 
 DATA_TYPES = {
     "csv",
@@ -72,22 +72,19 @@ def polars(
     kwargs.pop("write_type", None)
     kwargs.pop("write_path", None)
 
-    streaming = streaming in {"", "True", "true", "T", "t", "1"}
+    _write_type = (
+        infer_type(write_type, write_path, DATA_TYPES.union({"markdown"}), polars=True)
+        or "csv"
+    )
 
-    if read_type is not None:
-        assert read_type in DATA_TYPES, (
-            str(read_type) + "not in the supported list: " + str(DATA_TYPES)
-        )
+    streaming = streaming in {"", "True", "true", "T", "t", "1"}
 
     import polars as pl
 
     ls = []
     for path in paths:
-        if read_type is None:
-            _read_type = path.split(".")[-1].replace("jsonl", "ndjson")
-        else:
-            _read_type = read_type
-        if _read_type not in DATA_TYPES:
+        _read_type = infer_type(read_type, path, DATA_TYPES, polars=True)
+        if not _read_type:
             continue
 
         _kwargs = kwargs.copy()
@@ -157,13 +154,6 @@ def polars(
         else:
             stdout_lines(text)
         return
-
-    _write_type = write_type
-    if write_type is None:
-        if write_path:
-            _write_type = write_path.split(".")[-1]
-        if _write_type not in (DATA_TYPES.union({"markdown"})):
-            _write_type = "csv"
 
     if _write_type == "markdown":
 
