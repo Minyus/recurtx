@@ -2,24 +2,15 @@ import sys
 from pathlib import Path
 
 
-def search(
+def run_search(
     target: str,
-    path: str,
+    path: Path,
+    text: str,
     sub: str = None,
     wildcard: str = "*",
     verbose: int = 1,
 ):
-    """Search a keyword, which may include wildcards, in the text file content, and optionally substitute (replace)."""
-
     target_ls = eval("'''" + target + "'''").split(wildcard)
-
-    p = Path(path)
-    try:
-        text = p.read_text()
-    except Exception:
-        if verbose >= 3:
-            raise
-        return
 
     replacing_ls = []
     end_index = 0
@@ -42,11 +33,66 @@ def search(
                 replacing_ls.append(replacing)
             if verbose >= 1:
                 sys.stdout.write(
-                    f"{p} [{start_index}:{end_index}]\n{text[start_index:end_index]}\n"
+                    f"{path} [{start_index}:{end_index}]\n{text[start_index:end_index]}\n"
                 )
         else:
             break
     for replacing in replacing_ls:
         text = text.replace(replacing, sub, 1)
+
+    return text
+
+
+def search(
+    target: str,
+    path: str,
+    sub: str = None,
+    wildcard: str = "*",
+    verbose: int = 1,
+):
+    """Search a keyword, which may include wildcards, in the text file content, and optionally substitute (replace)."""
+
+    path = Path(path)
+    try:
+        text = path.read_text()
+    except Exception:
+        if verbose >= 3:
+            raise
+        return
+
+    text = run_search(
+        target,
+        path,
+        text,
+        sub,
+        wildcard,
+        verbose,
+    )
+
     if sub is not None:
-        p.write_text(text)
+        path.write_text(text)
+
+
+def find(
+    target: str,
+    path: str,
+    sub: str = None,
+    wildcard: str = "*",
+    verbose: int = 1,
+):
+    """Find a keyword, which may include wildcards, in the file path, and optionally substitute (replace)."""
+
+    text = path
+    path = Path(path)
+
+    text = run_search(
+        target,
+        path,
+        text,
+        sub,
+        wildcard,
+        verbose,
+    )
+
+    if sub is not None:
+        path.rename(text)

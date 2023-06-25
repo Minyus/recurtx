@@ -1,10 +1,9 @@
 import fire
 
-from .find import find
 from .pandas import pandas
 from .polars import polars
 from .recur import batch, under
-from .search import search
+from .search import find, search
 
 
 def main():
