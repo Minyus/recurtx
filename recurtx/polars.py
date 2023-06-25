@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from typing import List
 
 DATA_TYPES = {
     "csv",
@@ -30,6 +31,8 @@ def activate(
 def polars(
     *paths: str,
     read_type: str = None,
+    columns: List[str] = None,
+    excluding_columns: List[str] = None,
     streaming: str = None,  # actually bool
     fetch: int = None,
     join: str = None,
@@ -48,6 +51,9 @@ def polars(
     """Read and transform tabular files using polars."""
 
     """Workaround for unexpected behavior of Fire"""
+    kwargs.pop("read_type", None)
+    kwargs.pop("columns", None)
+    kwargs.pop("excluding_columns", None)
     kwargs.pop("streaming", None)
     kwargs.pop("fetch", None)
     kwargs.pop("join", None)
@@ -79,16 +85,28 @@ def polars(
             _read_type = read_type
         if _read_type not in DATA_TYPES:
             continue
+
         _kwargs = kwargs.copy()
         if read_type == "csv":
             _kwargs.setdefault("missing_utf8_is_empty_string", True)
             _kwargs.setdefault("infer_schema_length", 0)
+
         read_func = getattr(pl, "scan_" + _read_type, None)
         if read_func is None:
             read_func = getattr(pl, "read_" + _read_type)
             df = read_func(path, **_kwargs).lazy()
         else:
             df = read_func(path, **_kwargs)
+
+        if columns:
+            df = df.select(columns)
+        if excluding_columns:
+            if isinstance(excluding_columns, str):
+                excluding_columns = [excluding_columns]
+            _columns = df.columns
+            _columns = [c for c in _columns if c not in excluding_columns]
+            df = df.select(_columns)
+
         ls.append(df)
 
     if not ls:

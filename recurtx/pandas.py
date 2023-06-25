@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from typing import List
 
 DATA_TYPES = {
     "pickle",
@@ -29,6 +30,8 @@ def pandas(
     *paths: str,
     package: str = "pandas",
     read_type: str = None,
+    columns: List[str] = None,
+    excluding_columns: List[str] = None,
     join: str = None,
     merge: str = None,
     on: str = None,
@@ -91,6 +94,11 @@ def pandas(
         )
     import numpy as np
 
+    if columns and isinstance(columns, str):
+        columns = [columns]
+    if excluding_columns and isinstance(excluding_columns, str):
+        excluding_columns = [excluding_columns]
+
     ls = []
     for path in paths:
         if read_type is None:
@@ -104,7 +112,17 @@ def pandas(
         if read_type == "csv":
             _kwargs.setdefault("dtype", str)
             _kwargs.setdefault("keep_default_na", False)
+            if columns:
+                _kwargs.setdefault("usecols", columns)
         df = read_func(path, **_kwargs)
+
+        if columns:
+            df = df[columns]
+        if excluding_columns:
+            _columns = df.columns
+            _columns = [c for c in _columns if c not in excluding_columns]
+            df = df[_columns]
+
         if query:
             df = df.query(query)
         ls.append(df)
