@@ -79,12 +79,16 @@ def polars(
             _read_type = read_type
         if _read_type not in DATA_TYPES:
             continue
+        _kwargs = kwargs.copy()
+        if read_type == "csv":
+            _kwargs.setdefault("missing_utf8_is_empty_string", True)
+            _kwargs.setdefault("infer_schema_length", 0)
         read_func = getattr(pl, "scan_" + _read_type, None)
         if read_func is None:
             read_func = getattr(pl, "read_" + _read_type)
-            df = read_func(path, **kwargs).lazy()
+            df = read_func(path, **_kwargs).lazy()
         else:
-            df = read_func(path, **kwargs)
+            df = read_func(path, **_kwargs)
         ls.append(df)
 
     if not ls:
