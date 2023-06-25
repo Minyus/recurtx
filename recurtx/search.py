@@ -63,8 +63,8 @@ def run_search(
                     )
             else:
                 break
-        for replacing in replacing_ls:
-            text = text.replace(replacing, sub, 1)
+        for replacing in list(set(replacing_ls)):
+            text = text.replace(replacing, sub)
 
     return text
 
