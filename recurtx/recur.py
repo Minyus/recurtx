@@ -1,3 +1,4 @@
+import re
 import sys
 from pathlib import Path
 
@@ -11,10 +12,19 @@ def recur(
     **kwargs: str,
 ):
     glob = kwargs.pop("glob", "**/*")
+    regex = kwargs.pop(
+        "regex",
+        r"^(?!.*(\.git\/|__pycache__\/|\.ipynb_checkpoints\/|\.pytest_cache\/|\.vscode\/|\.idea\/|\.DS_Store)).*$",
+    )
     reverse = kwargs.pop("reverse", False)
     replace_str = kwargs.pop("replace_str", "@@")
     show_paths = kwargs.pop("show_paths", False)
     show_scripts = kwargs.pop("show_scripts", False)
+
+    if regex:
+        rx = re.compile(regex)
+    else:
+        rx = None
 
     scripts = list(scripts)
     if len(kwargs) and len(scripts) == 1:
@@ -48,7 +58,10 @@ def recur(
         path_ls = [str(path)]
     else:
         path_ls = [str(p) for p in path.glob(glob) if p.is_file()]
+        if rx:
+            path_ls = [p for p in path_ls if rx.match(p)]
         path_ls.sort(reverse=reverse)
+
     if show_paths:
         sys.stdout.write(
             "[Searching files]\n" + str("\n".join(["    " + p for p in path_ls]) + "\n")
