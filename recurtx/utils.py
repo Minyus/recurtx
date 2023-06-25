@@ -23,7 +23,7 @@ def subprocess_run(
     verbose: bool = True,
 ):
     if verbose:
-        sys.stdout.write(r">>> " + script + "\n")
+        sys.stdout.write(r">>> " + str(script) + "\n")
 
         from time import sleep
 

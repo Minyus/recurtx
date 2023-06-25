@@ -73,7 +73,10 @@ def recur(
             try:
                 if replace_str:
                     running_scripts = [
-                        script.replace(replace_str, p) for script in scripts
+                        script.replace(replace_str, p)
+                        if isinstance(script, str)
+                        else script
+                        for script in scripts
                     ]
                 if len(running_scripts) == 1:
                     running_scripts = running_scripts[0]
