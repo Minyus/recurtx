@@ -2,6 +2,8 @@ import sys
 from pathlib import Path
 from typing import List
 
+from .utils import stdout_lines
+
 DATA_TYPES = {
     "csv",
     "ipc",
@@ -45,6 +47,7 @@ def polars(
     tail: int = None,
     sample: int = None,
     method: str = None,
+    write_type: str = None,
     write_path: str = None,
     **kwargs,
 ):
@@ -66,6 +69,7 @@ def polars(
     kwargs.pop("tail", None)
     kwargs.pop("sample", None)
     kwargs.pop("method", None)
+    kwargs.pop("write_type", None)
     kwargs.pop("write_path", None)
 
     streaming = streaming in {"", "True", "true", "T", "t", "1"}
@@ -151,11 +155,33 @@ def polars(
         if write_path:
             Path(write_path).write_text(text)
         else:
-            sys.stdout.write(text)
+            stdout_lines(text)
         return
 
-    if write_path:
-        df.write_csv(write_path)
+    _write_type = write_type
+    if write_type is None:
+        if write_path:
+            _write_type = write_path.split(".")[-1]
+        if _write_type not in (DATA_TYPES.union({"markdown"})):
+            _write_type = "csv"
+
+    if _write_type == "markdown":
+
+        def write_func(write_path: str = None):
+            from io import StringIO
+
+            import pandas as pd
+
+            nonlocal df
+            csv_text = df.write_csv()
+            df = pd.read_csv(StringIO(csv_text), dtype=str, keep_default_na=False)
+            return df.to_markdown(write_path, index=False)
+
     else:
-        sys.stdout.write(df.write_csv())
-    return
+        write_func = getattr(df, "write_" + _write_type)
+
+    if write_path:
+        write_func(write_path)
+    else:
+        text = write_func()
+        stdout_lines(text)

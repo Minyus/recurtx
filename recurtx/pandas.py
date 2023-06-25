@@ -2,6 +2,8 @@ import sys
 from pathlib import Path
 from typing import List
 
+from .utils import stdout_lines
+
 DATA_TYPES = {
     "pickle",
     "table",
@@ -51,6 +53,7 @@ def pandas(
     tail: int = None,
     sample: int = None,
     method: str = None,
+    write_type: str = None,
     write_path: str = None,
     **kwargs,
 ):
@@ -77,6 +80,7 @@ def pandas(
     kwargs.pop("tail", None)
     kwargs.pop("sample", None)
     kwargs.pop("method", None)
+    kwargs.pop("write_type", None)
     kwargs.pop("write_path", None)
 
     if read_type is not None:
@@ -208,10 +212,19 @@ def pandas(
         if write_path:
             Path(write_path).write_text(text)
         else:
-            sys.stdout.write(text)
+            stdout_lines(text)
         return
 
+    _write_type = write_type
+    if write_type is None:
+        if write_path:
+            _write_type = write_path.split(".")[-1]
+        if _write_type not in (DATA_TYPES.union({"markdown"})):
+            _write_type = "csv"
+
+    write_func = getattr(df, "to_" + _write_type)
     if write_path:
-        df.to_csv(write_path, index=False)
+        write_func(write_path, index=False)
     else:
-        sys.stdout.write(df.to_csv(index=False))
+        text = write_func(index=False)
+        stdout_lines(text)
