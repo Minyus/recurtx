@@ -28,7 +28,7 @@ pip install -e .
 
 ## Wrapper Commands
 
-### recurtx under
+### xunder
 
 Run any scripts for each file under a directory recursively.
 
@@ -37,13 +37,13 @@ Run any scripts for each file under a directory recursively.
 Run `wc -l {FILEPATH}` for each file under `directory_foo` recursively:
 
 ```
-recurtx under directory_foo "wc -l"
+xunder directory_foo "wc -l"
 ```
 
 Quoting for the script can be omitted for most cases. 
 
 ```
-recurtx under directory_foo wc -l
+xunder directory_foo wc -l
 ```
 
 Caveat: int, float, tuple, list, dict could be formatted unexpectedly (by `fire` package), for example:
@@ -53,10 +53,10 @@ Caveat: int, float, tuple, list, dict could be formatted unexpectedly (by `fire`
 
 ```
 NAME
-    recurtx under
+    xunder
 
 SYNOPSIS
-    recurtx under PATH <flags> [SCRIPTS]...
+    xunder PATH <flags> [SCRIPTS]...
 
 POSITIONAL ARGUMENTS
     PATH
@@ -82,7 +82,7 @@ NOTES
     You can also use flags syntax for POSITIONAL ARGUMENTS
 ```
 
-### recurtx batch
+### xbatch
 
 Run any scripts for a batch of files in a directory recursively.
 
@@ -91,17 +91,17 @@ Run any scripts for a batch of files in a directory recursively.
 Concatenate all the contents in directory_foo.
 
 ```
-recurtx batch directory_foo cat
+xbatch directory_foo cat
 ```
 
 #### Description
 
 ```
 NAME
-    recurtx batch
+    xbatch
 
 SYNOPSIS
-    recurtx batch PATH <flags> [SCRIPTS]...
+    xbatch PATH <flags> [SCRIPTS]...
 
 POSITIONAL ARGUMENTS
     PATH
@@ -129,7 +129,7 @@ NOTES
 
 ## Commands to transform text files
 
-### recurtx search
+### xsearch
 
 Search a keyword, which may include wildcards, in the text file content, and optionally substitute (replace).
 
@@ -138,23 +138,23 @@ Search a keyword, which may include wildcards, in the text file content, and opt
 Search `keyword_bar` in each file under `directory_foo` recursively:
 
 ```
-recurtx under directory_foo recurtx search keyword_bar
+xunder directory_foo xsearch keyword_bar
 ```
 
 Search `keyword_bar` and substitute (replace) with `keyword_baz` in each file under `directory_foo` recursively:
 
 ```
-recurtx under directory_foo recurtx search keyword_bar --sub keyword_baz
+xunder directory_foo xsearch keyword_bar --sub keyword_baz
 ```
 
 #### Description
 
 ```
 NAME
-    recurtx search
+    xsearch
 
 SYNOPSIS
-    recurtx search TARGET PATH <flags>
+    xsearch TARGET PATH <flags>
 
 POSITIONAL ARGUMENTS
     TARGET
@@ -177,7 +177,7 @@ NOTES
     You can also use flags syntax for POSITIONAL ARGUMENTS
 ```
 
-### recurtx find
+### xfind
 
 Find a keyword, which may include wildcards, in the file path, and optionally substitute (replace).
 
@@ -186,23 +186,23 @@ Find a keyword, which may include wildcards, in the file path, and optionally su
 Search `keyword_bar` in each file path under `directory_foo` recursively:
 
 ```
-recurtx under directory_foo recurtx find keyword_bar
+xunder directory_foo xfind keyword_bar
 ```
 
 Search `keyword_bar` and substitute (replace) with `keyword_baz` in each file path under `directory_foo` recursively:
 
 ```
-recurtx under directory_foo recurtx find keyword_bar --sub keyword_baz
+xunder directory_foo xfind keyword_bar --sub keyword_baz
 ```
 
 #### Description
 
 ```
 NAME
-    recurtx find
+    xfind
 
 SYNOPSIS
-    recurtx find TARGET PATH <flags>
+    xfind TARGET PATH <flags>
 
 POSITIONAL ARGUMENTS
     TARGET
@@ -225,17 +225,7 @@ NOTES
     You can also use flags syntax for POSITIONAL ARGUMENTS
 ```
 
-### recurtx pandas
-
-Read and transform tabular files using pandas.
-
-#### Install dependency
-
-```
-pip install pandas
-```
-
-### recurtx pandas
+### xpandas
 
 Read and transform tabular data using pandas.
 
@@ -275,10 +265,10 @@ pip install pandas
 Read files supported by pandas (such as csv and json) under directory_foo and concatenate:
 
 ```
-recurtx batch directory_foo recurtx pandas
+xbatch directory_foo xpandas
 ```
 
-### recurtx polars
+### xpolars
 
 Read and transform tabular data using polars.
 
@@ -307,7 +297,7 @@ pip install polars
 Read files supported by polars (such as csv and json) under directory_foo and concatenate:
 
 ```
-recurtx batch directory_foo recurtx polars
+xbatch directory_foo xpolars
 ```
 
 ## Dependency to enable CLI
