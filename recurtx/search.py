@@ -3,14 +3,14 @@ from pathlib import Path
 
 
 def run_search(
+    text: str,
     target: str,
     path: Path,
-    text: str,
     sub: str = None,
     wildcard: str = "*",
+    separator: str = "/",
     verbose: int = 1,
 ):
-    separator: str = ";;"
     assert isinstance(separator, str), str(separator) + ": " + str(type(separator))
 
     if isinstance(target, (list, tuple, set, dict)):
@@ -74,6 +74,7 @@ def search(
     path: str,
     sub: str = None,
     wildcard: str = "*",
+    separator: str = "/",
     verbose: int = 1,
 ):
     """Search a keyword, which may include wildcards, in the text file content, and optionally substitute (replace)."""
@@ -87,12 +88,13 @@ def search(
         return
 
     text = run_search(
-        target,
-        path,
-        text,
-        sub,
-        wildcard,
-        verbose,
+        text=text,
+        target=target,
+        path=path,
+        sub=sub,
+        wildcard=wildcard,
+        separator=separator,
+        verbose=verbose,
     )
 
     if sub is not None:
@@ -104,6 +106,7 @@ def find(
     path: str,
     sub: str = None,
     wildcard: str = "*",
+    separator: str = "/",
     verbose: int = 1,
 ):
     """Find a keyword, which may include wildcards, in the file path, and optionally substitute (replace)."""
@@ -112,12 +115,13 @@ def find(
     path = Path(path)
 
     text = run_search(
-        target,
-        path,
-        text,
-        sub,
-        wildcard,
-        verbose,
+        text=text,
+        target=target,
+        path=path,
+        sub=sub,
+        wildcard=wildcard,
+        separator=separator,
+        verbose=verbose,
     )
 
     if sub is not None:
