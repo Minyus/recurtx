@@ -34,6 +34,7 @@ def pandas(
     read_type: str = None,
     columns: List[str] = None,
     excluding_columns: List[str] = None,
+    filepath_column: str = None,
     join: str = None,
     merge: str = None,
     on: str = None,
@@ -61,6 +62,10 @@ def pandas(
 
     """Workaround for unexpected behavior of Fire"""
     kwargs.pop("package", None)
+    kwargs.pop("read_type", None)
+    kwargs.pop("columns", None)
+    kwargs.pop("excluding_columns", None)
+    kwargs.pop("filepath_column", None)
     kwargs.pop("join", None)
     kwargs.pop("merge", None)
     kwargs.pop("on", None)
@@ -122,6 +127,9 @@ def pandas(
             _columns = df.columns
             _columns = [c for c in _columns if c not in excluding_columns]
             df = df[_columns]
+
+        if filepath_column:
+            df[filepath_column] = path
 
         if query:
             df = df.query(query)

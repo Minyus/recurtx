@@ -16,6 +16,8 @@ DATA_TYPES = {
     "delta",
 }
 
+TRUE_VALUES = {"", "True", "true", "T", "t", "1"}
+
 
 def activate(
     df,
@@ -35,6 +37,7 @@ def polars(
     read_type: str = None,
     columns: List[str] = None,
     excluding_columns: List[str] = None,
+    filepath_column: str = None,
     streaming: str = None,  # actually bool
     fetch: int = None,
     join: str = None,
@@ -57,6 +60,7 @@ def polars(
     kwargs.pop("read_type", None)
     kwargs.pop("columns", None)
     kwargs.pop("excluding_columns", None)
+    kwargs.pop("filepath_column", None)
     kwargs.pop("streaming", None)
     kwargs.pop("fetch", None)
     kwargs.pop("join", None)
@@ -77,7 +81,7 @@ def polars(
         or "csv"
     )
 
-    streaming = streaming in {"", "True", "true", "T", "t", "1"}
+    streaming = streaming in TRUE_VALUES
 
     import polars as pl
 
@@ -107,6 +111,9 @@ def polars(
             _columns = df.columns
             _columns = [c for c in _columns if c not in excluding_columns]
             df = df.select(_columns)
+
+        if filepath_column:
+            df = df.with_columns(pl.lit(path).alias(filepath_column))
 
         ls.append(df)
 
