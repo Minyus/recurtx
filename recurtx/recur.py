@@ -6,7 +6,6 @@ from .utils import get_exception_msg, subprocess_run, upath
 
 
 def recur(
-    kind: str,
     path: str,
     *scripts: str,
     **kwargs: str,
@@ -67,47 +66,7 @@ def recur(
         sys.stdout.write(
             "[Searching files]\n" + str("\n".join(["    " + p for p in path_ls]) + "\n")
         )
-
-    running_scripts = scripts
-    if kind == "under":
-        for p in path_ls:
-            try:
-                if replace_str:
-                    running_scripts = [
-                        script.replace(replace_str, p)
-                        if isinstance(script, str)
-                        else script
-                        for script in scripts
-                    ]
-                if len(running_scripts) == 1:
-                    running_scripts = running_scripts[0]
-                subprocess_run(running_scripts, show_scripts)
-            except Exception:
-                msg = get_exception_msg()
-                sys.stdout.write(msg)
-                continue
-
-    elif kind == "batch":
-        if len(scripts) == 1:
-            running_scripts = scripts[0]
-            if replace_str:
-                running_scripts = running_scripts.replace(
-                    replace_str, " ".join(path_ls)
-                )
-        else:
-            running_scripts = []
-            for script in scripts:
-                if replace_str and (script == replace_str):
-                    running_scripts.extend(path_ls)
-                else:
-                    running_scripts.append(script)
-        try:
-            subprocess_run(running_scripts, show_scripts)
-        except Exception:
-            msg = get_exception_msg()
-            sys.stdout.write(msg)
-    else:
-        raise NotImplementedError()
+    return path_ls, scripts, replace_str, show_scripts
 
 
 def under(
@@ -117,13 +76,29 @@ def under(
 ):
     """Run any scripts for each file under a directory recursively."""
 
-    kind = "under"
-    recur(
-        kind,
+    path_ls, scripts, replace_str, show_scripts = recur(
         path,
         *scripts,
         **kwargs,
     )
+
+    running_scripts = scripts
+    for p in path_ls:
+        try:
+            if replace_str:
+                running_scripts = [
+                    script.replace(replace_str, p)
+                    if isinstance(script, str)
+                    else script
+                    for script in scripts
+                ]
+            if len(running_scripts) == 1:
+                running_scripts = running_scripts[0]
+            subprocess_run(running_scripts, show_scripts)
+        except Exception:
+            msg = get_exception_msg()
+            sys.stdout.write(msg)
+            continue
 
 
 def batch(
@@ -133,10 +108,26 @@ def batch(
 ):
     """Run any scripts for a batch of files in a directory recursively."""
 
-    kind = "batch"
-    recur(
-        kind,
+    path_ls, scripts, replace_str, show_scripts = recur(
         path,
         *scripts,
         **kwargs,
     )
+
+    running_scripts = scripts
+    if len(scripts) == 1:
+        running_scripts = scripts[0]
+        if replace_str:
+            running_scripts = running_scripts.replace(replace_str, " ".join(path_ls))
+    else:
+        running_scripts = []
+        for script in scripts:
+            if replace_str and (script == replace_str):
+                running_scripts.extend(path_ls)
+            else:
+                running_scripts.append(script)
+    try:
+        subprocess_run(running_scripts, show_scripts)
+    except Exception:
+        msg = get_exception_msg()
+        sys.stdout.write(msg)
