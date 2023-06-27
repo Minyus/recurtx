@@ -8,6 +8,7 @@ console_scripts = [
     "xbatch = recurtx.__main__:xbatch",
     "xsearch = recurtx.__main__:xsearch",
     "xfind = recurtx.__main__:xfind",
+    "xstat = recurtx.__main__:xstat",
 ]
 
 

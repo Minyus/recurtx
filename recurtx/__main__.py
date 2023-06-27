@@ -2,7 +2,7 @@ import fire
 
 from .pandas import pandas
 from .polars import polars
-from .recur import batch, under
+from .recur import batch, stat, under
 from .search import find, search
 
 
@@ -14,6 +14,7 @@ def main():
             polars=polars,
             find=find,
             search=search,
+            stat=stat,
             under=under,
         )
     )
@@ -43,6 +44,10 @@ def xsearch():
     fire.Fire(search)
 
 
+def xstat():
+    fire.Fire(stat)
+
+
 if __name__ == "__main__":
     main()
     xpandas()
@@ -51,3 +56,4 @@ if __name__ == "__main__":
     xunder()
     xfind()
     xsearch()
+    xstat()
