@@ -18,7 +18,7 @@ def recur(
         r"^(?!.*(\.git\/|__pycache__\/|\.ipynb_checkpoints\/|\.pytest_cache\/|\.vscode\/|\.idea\/|\.DS_Store)).*$",
     )
     type = kwargs.pop("type", "file")
-    reverse = kwargs.pop("reverse", False)
+    sort_paths = kwargs.pop("sort_paths", "asc")
     replace_str = kwargs.pop("replace_str", "@@")
     show_paths = kwargs.pop("show_paths", False)
     show_scripts = kwargs.pop("show_scripts", False)
@@ -62,7 +62,9 @@ def recur(
         path_ls = [str(p) for p in path.glob(glob) if getattr(p, "is_" + type)()]
         if rx:
             path_ls = [p for p in path_ls if rx.match(p)]
-        path_ls.sort(reverse=reverse)
+        if sort_paths:
+            assert isinstance(sort_paths, str), sort_paths
+            path_ls.sort(reverse=(sort_paths.lower().startswith("desc")))
 
     if show_paths:
         sys.stdout.write(
