@@ -146,8 +146,6 @@ def stat(
     """Compute statistics for the directory recursively."""
 
     for path in paths:
-        out_ls = []
-
         dir_path_ls, scripts, replace_str, show_scripts = recur(
             path,
             **kwargs,
@@ -155,11 +153,28 @@ def stat(
 
         type = kwargs.get("type", "file")
 
+        stat_ls = []
+
         for dir_path in dir_path_ls:
             path_ls, scripts, replace_str, show_scripts = recur(
                 dir_path,
             )
 
+            d = _get_stat(
+                dir_path=dir_path,
+                path_ls=path_ls,
+                extension_most_common=extension_most_common,
+                number_limit=number_limit,
+                type=type,
+            )
+            stat_ls.append(d)
+
+        _output_stat(stat_ls)
+
+
+def _get_stat(dir_path, path_ls, extension_most_common, number_limit, type):
+    if True:
+        if True:
             num_files = len(path_ls)
 
             divisor = None
@@ -192,7 +207,6 @@ def stat(
                 total_size *= divisor
 
             d = dict(path=dir_path)
-            colalign_ls = ["left"]
 
             num_files = "{:,}".format(num_files)
             total_size = "{:,}".format(total_size)
@@ -208,20 +222,26 @@ def stat(
                     )
                 )
                 d.update(common_ext_dict)
-                colalign_ls.extend(["right"] * 4)
             else:
                 d.update(dict(size=total_size))
-                colalign_ls.extend(["right"])
 
-            out_ls.append(d)
+            return d
 
+
+def _output_stat(stat_ls):
+    if True:
         try:
             import pandas as pd
 
-            df = pd.DataFrame(out_ls)
+            colalign_ls = None
+            if stat_ls:
+                colalign_ls = ["right"] * len(stat_ls[0])
+                colalign_ls[0] = "left"
+
+            df = pd.DataFrame(stat_ls)
             md = df.to_markdown(index=False, colalign=colalign_ls)
             sys.stdout.write(str(md) + "\n")
         except:
             import json
 
-            sys.stdout.write(json.dumps(out_ls, index=2), "\n")
+            sys.stdout.write(json.dumps(stat_ls, index=2), "\n")
