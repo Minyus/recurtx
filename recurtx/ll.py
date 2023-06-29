@@ -8,8 +8,8 @@ from .utils import upath
 
 def ll(
     *paths: str,
-    glob: str = "**/*",
-    depth: int = None,
+    glob: str = None,
+    depth: int = 1,
     type: str = None,
     file_glob: str = "**/*",
     number_limit: int = 1000,
@@ -20,7 +20,8 @@ def ll(
 
     paths = paths or ["."]
 
-    if depth:
+    if not glob:
+        assert depth, depth
         glob = "".join(["*/"] * (depth - 1)) + "*"
 
     stat_ls = []
