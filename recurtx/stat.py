@@ -9,7 +9,7 @@ from .utils import upath
 def stat(
     *paths: str,
     glob: str = "**/*",
-    type: str = "dir",
+    type: str = None,
     file_glob: str = "*",
     number_limit: int = 1000,
     sort_paths: str = "asc",
@@ -22,7 +22,10 @@ def stat(
     for path in paths:
         path = Path(upath(path))
 
-        dir_path_ls = [p for p in (path.glob(glob)) if getattr(p, "is_" + type)()]
+        if type:
+            dir_path_ls = [p for p in (path.glob(glob)) if getattr(p, "is_" + type)()]
+        else:
+            dir_path_ls = list(path.glob(glob))
 
         if sort_paths:
             assert isinstance(sort_paths, str), sort_paths
@@ -99,7 +102,9 @@ def _get_stat(
             total_size = "{:,}".format(total_size)
             max_size = "{:,}".format(max_size)
 
-            if type == "dir":
+            if type == "file":
+                d.update(dict(size=total_size))
+            else:
                 d.update(
                     dict(
                         num_files=num_files,
@@ -109,8 +114,6 @@ def _get_stat(
                     )
                 )
                 d.update(common_ext_dict)
-            else:
-                d.update(dict(size=total_size))
 
             return d
 
