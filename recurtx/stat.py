@@ -17,6 +17,8 @@ def stat(
 ):
     """Compute statistics for the directory recursively."""
 
+    paths = paths or ["."]
+
     stat_ls = []
 
     for path in paths:
