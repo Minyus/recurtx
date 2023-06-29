@@ -8,8 +8,8 @@ from .utils import upath
 
 def ll(
     *paths: str,
-    glob: str = None,
     depth: int = 1,
+    glob: str = None,
     type: str = None,
     file_glob: str = "**/*",
     number_limit: int = 1000,
