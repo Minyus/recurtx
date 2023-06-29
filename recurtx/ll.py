@@ -11,7 +11,7 @@ def ll(
     glob: str = "**/*",
     depth: int = None,
     type: str = None,
-    file_glob: str = "*",
+    file_glob: str = "**/*",
     number_limit: int = 1000,
     sort_paths: str = "asc",
     extension_most_common: int = 1,
