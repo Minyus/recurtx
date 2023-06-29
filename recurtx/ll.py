@@ -6,7 +6,7 @@ from pathlib import Path
 from .utils import upath
 
 
-def stat(
+def ll(
     *paths: str,
     glob: str = "**/*",
     depth: int = None,

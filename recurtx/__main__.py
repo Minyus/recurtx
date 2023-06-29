@@ -1,10 +1,10 @@
 import fire
 
+from .ll import ll
 from .pandas import pandas
 from .polars import polars
 from .recur import batch, under
 from .search import find, search
-from .stat import stat
 
 
 def main():
@@ -45,8 +45,8 @@ def xsearch():
     fire.Fire(search)
 
 
-def xstat():
-    fire.Fire(stat)
+def xll():
+    fire.Fire(ll)
 
 
 if __name__ == "__main__":
