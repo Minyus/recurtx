@@ -14,6 +14,7 @@ def ll(
     file_glob: str = "**/*",
     number_limit: int = 100,
     sort_paths: str = "asc",
+    info: bool = True,
     extension_most_common: int = 1,
 ):
     """Compute statistics for the directory recursively."""
@@ -37,18 +38,22 @@ def ll(
             assert isinstance(sort_paths, str), sort_paths
             dir_path_ls.sort(reverse=(sort_paths.lower().startswith("desc")))
 
-        for dir_path in dir_path_ls:
-            d = _get_stat(
-                dir_path=dir_path,
-                glob=file_glob,
-                type=type,
-                number_limit=number_limit,
-                extension_most_common=extension_most_common,
-            )
-            if d:
-                stat_ls.append(d)
+        if info:
+            for dir_path in dir_path_ls:
+                d = _get_stat(
+                    dir_path=dir_path,
+                    glob=file_glob,
+                    type=type,
+                    number_limit=number_limit,
+                    extension_most_common=extension_most_common,
+                )
+                if d:
+                    stat_ls.append(d)
+        else:
+            sys.stdout.write("\n".join([str(p) for p in dir_path_ls]) + "\n")
 
-    _output_stat(stat_ls)
+    if info:
+        _output_stat(stat_ls)
 
 
 def _get_stat(
