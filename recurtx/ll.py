@@ -12,7 +12,7 @@ def ll(
     glob: str = "**/*",
     type: str = None,
     file_glob: str = "**/*",
-    number_limit: int = 1000,
+    number_limit: int = 100,
     sort_paths: str = "asc",
     extension_most_common: int = 1,
 ):
@@ -66,14 +66,11 @@ def _get_stat(
     if not path_ls:
         return None
 
-    if number_limit:
-        path_ls = path_ls[:number_limit]
-
     if True:
         if True:
             num_files = len(path_ls)
 
-            divisor = 1
+            divisor = None
             if num_files > number_limit:
                 divisor = num_files / number_limit
 
@@ -100,13 +97,17 @@ def _get_stat(
                     for i in range(extension_most_common)
                 }
 
-            total_size *= divisor
-
             d = dict(path=str(dir_path) + (os.sep if dir_path.is_dir() else ""))
 
             num_files = "{:,}".format(num_files)
-            total_size = "{:,}".format(total_size)
-            max_size = "{:,}".format(max_size)
+
+            if divisor:
+                total_size = round(total_size * divisor)
+                total_size = "~ {:,}".format(total_size)
+                max_size = ">= {:,}".format(max_size)
+            else:
+                total_size = "{:,}".format(total_size)
+                max_size = "{:,}".format(max_size)
 
             if type == "file":
                 d.update(dict(size=total_size))
