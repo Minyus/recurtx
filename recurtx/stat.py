@@ -96,7 +96,7 @@ def _get_stat(
 
             total_size *= divisor
 
-            d = dict(path=str(dir_path))
+            d = dict(path=str(dir_path) + (os.sep if dir_path.is_dir() else ""))
 
             num_files = "{:,}".format(num_files)
             total_size = "{:,}".format(total_size)
