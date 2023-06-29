@@ -2,8 +2,9 @@ import fire
 
 from .pandas import pandas
 from .polars import polars
-from .recur import batch, stat, under
+from .recur import batch, under
 from .search import find, search
+from .stat import stat
 
 
 def main():
