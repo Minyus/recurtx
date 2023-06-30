@@ -84,7 +84,7 @@ def _get_stat(
     # mtime_ls = []
     ext_ls = []
     for p in path_ls:
-        st = os.stat(p)
+        st = p.stat()
         size_ls.append(st.st_size)
         # mtime_ls.append(st.st_mtime)
 
