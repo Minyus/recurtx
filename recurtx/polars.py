@@ -80,7 +80,7 @@ def polars(
         or "csv"
     )
 
-    streaming = streaming in TRUE_VALUES
+    streaming_flag = streaming in TRUE_VALUES
 
     import polars as pl
 
@@ -144,14 +144,14 @@ def polars(
         df = pl.concat(subset_ls)
 
     if sample is not None:
-        df = activate(df, fetch, streaming)
+        df = activate(df, fetch, streaming_flag)
         df = df.sample(sample)
         df = df.lazy()
 
     if method is not None:
         df = eval("df." + method)
 
-    df = activate(df, fetch, streaming)
+    df = activate(df, fetch, streaming_flag)
 
     if not isinstance(df, pl.DataFrame):
         text = "{}".format(df)

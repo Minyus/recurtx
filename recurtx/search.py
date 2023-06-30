@@ -1,19 +1,20 @@
 import sys
 from pathlib import Path
+from typing import List, Set, Tuple, Union
 
 
 def run_search(
     text: str,
-    target: str,
+    target: Union[str, List, Tuple, Set],
     path: Path,
-    sub: str = None,
+    sub: Union[str, List, Tuple, Set] = None,
     wildcard: str = "*",
     separator: str = "/",
     verbose: int = 1,
 ):
     assert isinstance(separator, str), str(separator) + ": " + str(type(separator))
 
-    if isinstance(target, (list, tuple, set, dict)):
+    if isinstance(target, (list, set, tuple)):
         targets = target
     else:
         assert isinstance(target, str), str(type(target))
@@ -22,7 +23,7 @@ def run_search(
         else:
             targets = [target]
 
-    if isinstance(sub, (list, tuple, set, dict)):
+    if isinstance(sub, (list, tuple, set)):
         subs = sub
     elif sub is None:
         subs = [None] * len(targets)
@@ -35,8 +36,8 @@ def run_search(
 
     assert len(targets) == len(subs), str(len(targets)) + " != " + str(len(subs))
 
-    for target, sub in zip(targets, subs):
-        target_ls = eval("'''" + target + "'''").split(wildcard)
+    for _target, _sub in zip(targets, subs):
+        target_ls = eval("'''" + _target + "'''").split(wildcard)
 
         replacing_ls = []
         end_index = 0
@@ -54,7 +55,7 @@ def run_search(
                     break
             if start_index and (index >= 0):
                 end_index = index
-                if sub is not None:
+                if _sub is not None:
                     replacing = text[start_index:end_index]
                     replacing_ls.append(replacing)
                 if verbose >= 1:
@@ -64,7 +65,7 @@ def run_search(
             else:
                 break
         for replacing in list(set(replacing_ls)):
-            text = text.replace(replacing, sub)
+            text = text.replace(replacing, _sub)
 
     return text
 
@@ -79,9 +80,9 @@ def search(
 ):
     """Search a keyword, which may include wildcards, in the text file content, and optionally substitute (replace)."""
 
-    path = Path(path)
+    _path = Path(path)
     try:
-        text = path.read_text()
+        text = _path.read_text()
     except Exception:
         if verbose >= 3:
             raise
@@ -90,7 +91,7 @@ def search(
     text = run_search(
         text=text,
         target=target,
-        path=path,
+        path=_path,
         sub=sub,
         wildcard=wildcard,
         separator=separator,
@@ -98,7 +99,7 @@ def search(
     )
 
     if sub is not None:
-        path.write_text(text)
+        _path.write_text(text)
 
 
 def find(
@@ -112,12 +113,12 @@ def find(
     """Find a keyword, which may include wildcards, in the file path, and optionally substitute (replace)."""
 
     text = path
-    path = Path(path)
+    _path = Path(path)
 
     text = run_search(
         text=text,
         target=target,
-        path=path,
+        path=_path,
         sub=sub,
         wildcard=wildcard,
         separator=separator,
@@ -125,4 +126,4 @@ def find(
     )
 
     if sub is not None:
-        path.rename(text)
+        _path.rename(text)

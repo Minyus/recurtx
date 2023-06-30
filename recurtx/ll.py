@@ -19,7 +19,7 @@ def ll(
 ):
     """Compute statistics for the directory recursively."""
 
-    paths = paths or ["."]
+    paths = paths or (".",)
 
     if depth:
         glob = "".join(["*/"] * (depth - 1)) + "*"
@@ -27,12 +27,12 @@ def ll(
     stat_ls = []
 
     for path in paths:
-        path = Path(upath(path))
+        _path = Path(upath(path))
 
         if type:
-            dir_path_ls = [p for p in (path.glob(glob)) if getattr(p, "is_" + type)()]
+            dir_path_ls = [p for p in (_path.glob(glob)) if getattr(p, "is_" + type)()]
         else:
-            dir_path_ls = list(path.glob(glob))
+            dir_path_ls = list(_path.glob(glob))
 
         if sort_paths:
             assert isinstance(sort_paths, str), sort_paths

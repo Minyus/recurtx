@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 from .utils import infer_type, stdout_lines
 
@@ -42,7 +42,7 @@ def pandas(
     left_index: bool = False,
     right_index: bool = False,
     sort: bool = False,
-    suffixes: str = ("_x", "_y"),
+    suffixes: Tuple[str, str] = ("_x", "_y"),
     copy: bool = True,
     indicator: bool = False,
     validate: str = None,
@@ -228,7 +228,8 @@ def pandas(
 
                 ls = df.to_dict(orient="records")
                 if write_path:
-                    json.dump(ls, write_path)
+                    with open(write_path, "w") as f:
+                        json.dump(ls, f)
                 else:
                     return json.dumps(ls)
             return _write_func(write_path, index=index)
