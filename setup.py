@@ -26,7 +26,7 @@ https://github.com/Minyus/recurtx
 
 setup(
     name="recurtx",
-    version="0.0.6",
+    version="0.0.7",
     packages=find_packages(exclude=["tests"]),
     entry_points={"console_scripts": console_scripts},
     install_requires=requires,
