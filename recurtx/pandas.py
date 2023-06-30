@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
-from .utils import infer_type, stdout_lines
+from .utils import infer_format, stdout_lines
 
 DATA_TYPES = {
     "pickle",
@@ -30,7 +30,7 @@ DATA_TYPES = {
 def pandas(
     *paths: str,
     package: str = "pandas",
-    read_type: Optional[str] = None,
+    input_format: Optional[str] = None,
     columns: Optional[List[str]] = None,
     excluding_columns: Optional[List[str]] = None,
     filepath_column: Optional[str] = None,
@@ -53,14 +53,14 @@ def pandas(
     tail: Optional[int] = None,
     sample: Optional[int] = None,
     method: Optional[str] = None,
-    write_type: Optional[str] = None,
-    write_path: Optional[str] = None,
+    output_format: Optional[str] = None,
+    output_path: Optional[str] = None,
     **kwargs: Any,
 ) -> None:
     """Read and transform tabular files using pandas."""
     """Workaround for unexpected behavior of Fire"""
     kwargs.pop("package", None)
-    kwargs.pop("read_type", None)
+    kwargs.pop("input_format", None)
     kwargs.pop("columns", None)
     kwargs.pop("excluding_columns", None)
     kwargs.pop("filepath_column", None)
@@ -83,11 +83,12 @@ def pandas(
     kwargs.pop("tail", None)
     kwargs.pop("sample", None)
     kwargs.pop("method", None)
-    kwargs.pop("write_type", None)
-    kwargs.pop("write_path", None)
+    kwargs.pop("output_format", None)
+    kwargs.pop("output_path", None)
 
-    _write_type = (
-        infer_type(write_type, write_path, DATA_TYPES.union({"markdown"})) or "csv"
+    _output_format = (
+        infer_format(output_format, output_path, DATA_TYPES.union({"markdown"}))
+        or "csv"
     )
 
     if package == "modin":
@@ -107,12 +108,12 @@ def pandas(
 
     ls = []
     for path in paths:
-        _read_type = infer_type(read_type, path, DATA_TYPES)
-        if not _read_type:
+        _input_format = infer_format(input_format, path, DATA_TYPES)
+        if not _input_format:
             continue
-        read_func = getattr(pd, "read_" + _read_type)
+        read_func = getattr(pd, "read_" + _input_format)
         _kwargs = kwargs.copy()
-        if read_type == "csv":
+        if input_format == "csv":
             _kwargs.setdefault("dtype", str)
             _kwargs.setdefault("keep_default_na", False)
             if columns:
@@ -211,35 +212,35 @@ def pandas(
 
     if not isinstance(df, pd.DataFrame):
         text = f"{df}"
-        if write_path:
-            Path(write_path).write_text(text)
+        if output_path:
+            Path(output_path).write_text(text)
         else:
             stdout_lines(text)
         return
 
-    _write_func = getattr(df, "to_" + _write_type)
+    _write_func = getattr(df, "to_" + _output_format)
 
     def write_func(
-        write_path: Optional[str] = None,
+        output_path: Optional[str] = None,
         index: bool = False,
     ) -> Optional[str]:
         nonlocal _write_func, df
         try:
-            if _write_type == "json":
+            if _output_format == "json":
                 import json
 
                 ls = df.to_dict(orient="records")
-                if write_path:
-                    with open(write_path, "w") as f:
+                if output_path:
+                    with open(output_path, "w") as f:
                         json.dump(ls, f)
                 else:
                     return json.dumps(ls)
-            return _write_func(write_path, index=index)
+            return _write_func(output_path, index=index)
         except Exception:
-            return _write_func(write_path)
+            return _write_func(output_path)
 
-    if write_path:
-        write_func(write_path=write_path, index=False)
+    if output_path:
+        write_func(output_path=output_path, index=False)
     else:
-        out_text = write_func(write_path=None, index=False)
+        out_text = write_func(output_path=None, index=False)
         stdout_lines(out_text)

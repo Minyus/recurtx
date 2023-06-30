@@ -3,7 +3,7 @@ from typing import Any, List, Optional
 
 import polars as pl
 
-from .utils import infer_type, stdout_lines
+from .utils import infer_format, stdout_lines
 
 DATA_TYPES = {
     "csv",
@@ -34,7 +34,7 @@ def activate(
 
 def polars(
     *paths: str,
-    read_type: Optional[str] = None,
+    input_format: Optional[str] = None,
     columns: Optional[List[str]] = None,
     excluding_columns: Optional[List[str]] = None,
     filepath_column: Optional[str] = None,
@@ -50,14 +50,14 @@ def polars(
     tail: Optional[int] = None,
     sample: Optional[int] = None,
     method: Optional[str] = None,
-    write_type: Optional[str] = None,
-    write_path: Optional[str] = None,
+    output_format: Optional[str] = None,
+    output_path: Optional[str] = None,
     **kwargs: Any,
 ) -> None:
     """Read and transform tabular files using polars."""
 
     """Workaround for unexpected behavior of Fire"""
-    kwargs.pop("read_type", None)
+    kwargs.pop("input_format", None)
     kwargs.pop("columns", None)
     kwargs.pop("excluding_columns", None)
     kwargs.pop("filepath_column", None)
@@ -73,11 +73,13 @@ def polars(
     kwargs.pop("tail", None)
     kwargs.pop("sample", None)
     kwargs.pop("method", None)
-    kwargs.pop("write_type", None)
-    kwargs.pop("write_path", None)
+    kwargs.pop("output_format", None)
+    kwargs.pop("output_path", None)
 
-    _write_type = (
-        infer_type(write_type, write_path, DATA_TYPES.union({"markdown"}), polars=True)
+    _output_format = (
+        infer_format(
+            output_format, output_path, DATA_TYPES.union({"markdown"}), polars=True
+        )
         or "csv"
     )
 
@@ -85,18 +87,18 @@ def polars(
 
     ls = []
     for path in paths:
-        _read_type = infer_type(read_type, path, DATA_TYPES, polars=True)
-        if not _read_type:
+        _input_format = infer_format(input_format, path, DATA_TYPES, polars=True)
+        if not _input_format:
             continue
 
         _kwargs = kwargs.copy()
-        if read_type == "csv":
+        if input_format == "csv":
             _kwargs.setdefault("missing_utf8_is_empty_string", True)
             _kwargs.setdefault("infer_schema_length", 0)
 
-        read_func = getattr(pl, "scan_" + _read_type, None)
+        read_func = getattr(pl, "scan_" + _input_format, None)
         if read_func is None:
-            read_func = getattr(pl, "read_" + _read_type)
+            read_func = getattr(pl, "read_" + _input_format)
             df = read_func(path, **_kwargs).lazy()
         else:
             df = read_func(path, **_kwargs)
@@ -154,15 +156,15 @@ def polars(
 
     if not isinstance(df, pl.DataFrame):
         text = f"{df}"
-        if write_path:
-            Path(write_path).write_text(text)
+        if output_path:
+            Path(output_path).write_text(text)
         else:
             stdout_lines(text)
         return
 
-    if _write_type == "markdown":
+    if _output_format == "markdown":
 
-        def write_func(write_path: Optional[str] = None) -> Optional[str]:
+        def write_func(output_path: Optional[str] = None) -> Optional[str]:
             from io import StringIO
 
             import pandas as pd
@@ -170,13 +172,13 @@ def polars(
             nonlocal df
             csv_text = df.write_csv()
             df = pd.read_csv(StringIO(csv_text), dtype=str, keep_default_na=False)
-            return df.to_markdown(write_path, index=False)
+            return df.to_markdown(output_path, index=False)
 
     else:
-        write_func = getattr(df, "write_" + _write_type)
+        write_func = getattr(df, "write_" + _output_format)
 
-    if write_path:
-        write_func(write_path)
+    if output_path:
+        write_func(output_path)
     else:
         out_text = write_func()
         stdout_lines(out_text)

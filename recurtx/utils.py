@@ -43,26 +43,26 @@ def stdout_lines(text: Optional[str]) -> None:
     return None
 
 
-def infer_type(
-    type: Optional[str],
+def infer_format(
+    format: Optional[str],
     path: Optional[str],
     supported_types: Set[str],
     polars: bool = False,
 ) -> Union[str, None]:
-    if isinstance(type, str) and type:
-        _type = type
-        _type = _type.replace("md", "markdown")
+    if isinstance(format, str) and format:
+        _format = format
+        _format = _format.replace("md", "markdown")
         if polars:
-            _type = _type.replace("jsonl", "ndjson")
-        assert _type in supported_types, (
-            _type + " not in supported set: " + str(supported_types)
+            _format = _format.replace("jsonl", "ndjson")
+        assert _format in supported_types, (
+            _format + " not in supported set: " + str(supported_types)
         )
-        return _type
+        return _format
     if isinstance(path, str) and path:
-        _type = path.split(".")[-1]
-        _type = _type.replace("md", "markdown")
+        _format = path.split(".")[-1]
+        _format = _format.replace("md", "markdown")
         if polars:
-            _type = _type.replace("jsonl", "ndjson")
-        if _type in supported_types:
-            return _type
+            _format = _format.replace("jsonl", "ndjson")
+        if _format in supported_types:
+            return _format
     return None
