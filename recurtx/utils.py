@@ -58,7 +58,7 @@ def infer_type(
             _type + " not in supported set: " + str(supported_types)
         )
         return _type
-    elif isinstance(path, str) and path:
+    if isinstance(path, str) and path:
         _type = path.split(".")[-1]
         _type = _type.replace("md", "markdown")
         if polars:
