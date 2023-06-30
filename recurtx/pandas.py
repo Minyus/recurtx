@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from .utils import infer_type, stdout_lines
 
@@ -30,35 +30,34 @@ DATA_TYPES = {
 def pandas(
     *paths: str,
     package: str = "pandas",
-    read_type: str = None,
-    columns: List[str] = None,
-    excluding_columns: List[str] = None,
-    filepath_column: str = None,
-    join: str = None,
-    merge: str = None,
-    on: str = None,
-    left_on: str = None,
-    right_on: str = None,
+    read_type: Optional[str] = None,
+    columns: Optional[List[str]] = None,
+    excluding_columns: Optional[List[str]] = None,
+    filepath_column: Optional[str] = None,
+    join: Optional[str] = None,
+    merge: Optional[str] = None,
+    on: Optional[str] = None,
+    left_on: Optional[str] = None,
+    right_on: Optional[str] = None,
     left_index: bool = False,
     right_index: bool = False,
     sort: bool = False,
     suffixes: Tuple[str, str] = ("_x", "_y"),
     copy: bool = True,
     indicator: bool = False,
-    validate: str = None,
-    lsuffix: str = None,
-    rsuffix: str = None,
-    query: str = None,
-    head: int = None,
-    tail: int = None,
-    sample: int = None,
-    method: str = None,
-    write_type: str = None,
-    write_path: str = None,
+    validate: Optional[str] = None,
+    lsuffix: Optional[str] = None,
+    rsuffix: Optional[str] = None,
+    query: Optional[str] = None,
+    head: Optional[int] = None,
+    tail: Optional[int] = None,
+    sample: Optional[int] = None,
+    method: Optional[str] = None,
+    write_type: Optional[str] = None,
+    write_path: Optional[str] = None,
     **kwargs,
 ):
     """Read and transform tabular files using pandas."""
-
     """Workaround for unexpected behavior of Fire"""
     kwargs.pop("package", None)
     kwargs.pop("read_type", None)
@@ -99,7 +98,7 @@ def pandas(
         raise NotImplementedError(
             "'" + package + "' not supported. Set one of ['pandas', 'modin']"
         )
-    import numpy as np
+    import numpy as np  # noqa: F401
 
     if columns and isinstance(columns, str):
         columns = [columns]
@@ -211,7 +210,7 @@ def pandas(
         df = eval("df." + method)
 
     if not isinstance(df, pd.DataFrame):
-        text = "{}".format(df)
+        text = f"{df}"
         if write_path:
             Path(write_path).write_text(text)
         else:
@@ -220,7 +219,7 @@ def pandas(
 
     _write_func = getattr(df, "to_" + _write_type)
 
-    def write_func(write_path: str = None, index=False):
+    def write_func(write_path: Optional[str] = None, index=False):
         nonlocal _write_func, df
         try:
             if _write_type == "json":
@@ -233,7 +232,7 @@ def pandas(
                 else:
                     return json.dumps(ls)
             return _write_func(write_path, index=index)
-        except:
+        except Exception:
             return _write_func(write_path)
 
     if write_path:

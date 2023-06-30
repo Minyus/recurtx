@@ -21,23 +21,20 @@ def recur(
     show_paths = kwargs.pop("show_paths", False)
     show_scripts = kwargs.pop("show_scripts", False)
 
-    if regex:
-        rx = re.compile(regex)
-    else:
-        rx = None
+    rx = re.compile(regex) if regex else None
 
     script_ls = list(scripts)
     if len(kwargs) and len(script_ls) == 1:
         script_ls = script_ls[0].split(" ")
     for k, v in kwargs.items():
-        if isinstance(v, bool) and v == False:
+        if isinstance(v, bool) and not v:
             continue
         if len(k) >= 2:
             script_ls.append("--" + k)
         elif len(k) == 1:
             script_ls.append("-" + k)
         else:
-            raise NotImplementedError()
+            raise NotImplementedError
         if isinstance(v, bool):
             continue
         script_ls.append(str(v))
@@ -45,7 +42,7 @@ def recur(
     if not script_ls:
         script_ls = ["echo"]
 
-    if replace_str and all([replace_str not in script for script in script_ls]):
+    if replace_str and all(replace_str not in script for script in script_ls):
         if len(script_ls) >= 2:
             script_ls.append(replace_str)
         else:

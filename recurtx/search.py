@@ -1,13 +1,13 @@
 import sys
 from pathlib import Path
-from typing import List, Set, Tuple, Union
+from typing import List, Optional, Set, Tuple, Union
 
 
 def run_search(
     text: str,
     target: Union[str, List, Tuple, Set],
     path: Path,
-    sub: Union[str, List, Tuple, Set] = None,
+    sub: Optional[Union[str, List, Tuple, Set]] = None,
     wildcard: str = "*",
     separator: str = "/",
     verbose: int = 1,
@@ -18,10 +18,7 @@ def run_search(
         targets = target
     else:
         assert isinstance(target, str), str(type(target))
-        if separator:
-            targets = target.split(separator)
-        else:
-            targets = [target]
+        targets = target.split(separator) if separator else [target]
 
     if isinstance(sub, (list, tuple, set)):
         subs = sub
@@ -29,10 +26,7 @@ def run_search(
         subs = [None] * len(targets)
     else:
         assert isinstance(sub, str), str(type(sub))
-        if separator:
-            subs = sub.split(separator)
-        else:
-            subs = [sub]
+        subs = sub.split(separator) if separator else [sub]
 
     assert len(targets) == len(subs), str(len(targets)) + " != " + str(len(subs))
 
@@ -60,7 +54,7 @@ def run_search(
                     replacing_ls.append(replacing)
                 if verbose >= 1:
                     sys.stdout.write(
-                        f"{path} [{start_index}:{end_index}]\n{text[start_index:end_index]}\n"
+                        f"{path} [{start_index}:{end_index}]\n{text[start_index:end_index]}\n",
                     )
             else:
                 break
@@ -73,13 +67,12 @@ def run_search(
 def search(
     target: str,
     path: str,
-    sub: str = None,
+    sub: Optional[str] = None,
     wildcard: str = "*",
     separator: str = "/",
     verbose: int = 1,
 ):
     """Search a keyword, which may include wildcards, in the text file content, and optionally substitute (replace)."""
-
     _path = Path(path)
     try:
         text = _path.read_text()
@@ -105,7 +98,7 @@ def search(
 def find(
     target: str,
     path: str,
-    sub: str = None,
+    sub: Optional[str] = None,
     wildcard: str = "*",
     separator: str = "/",
     verbose: int = 1,

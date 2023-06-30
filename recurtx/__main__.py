@@ -9,15 +9,15 @@ from .search import find, search
 
 def main():
     fire.Fire(
-        dict(
-            batch=batch,
-            pandas=pandas,
-            polars=polars,
-            find=find,
-            search=search,
-            stat=stat,
-            under=under,
-        )
+        {
+            "ll": ll,
+            "pandas": pandas,
+            "polars": polars,
+            "batch": batch,
+            "under": under,
+            "find": find,
+            "search": search,
+        },
     )
 
 

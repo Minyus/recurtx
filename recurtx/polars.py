@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from .utils import infer_type, stdout_lines
 
@@ -20,37 +20,36 @@ TRUE_VALUES = {"", "True", "true", "T", "t", "1"}
 
 def activate(
     df,
-    fetch: int = None,
-    streaming: bool = None,
+    fetch: Optional[int] = None,
+    streaming: Optional[bool] = None,
 ):
-    df = (
+    return (
         df.fetch(n_rows=fetch, streaming=streaming)
         if fetch
         else df.collect(streaming=streaming)
     )
-    return df
 
 
 def polars(
     *paths: str,
-    read_type: str = None,
-    columns: List[str] = None,
-    excluding_columns: List[str] = None,
-    filepath_column: str = None,
-    streaming: str = None,  # actually bool
-    fetch: int = None,
-    join: str = None,
-    on: str = None,
-    left_on: str = None,
-    right_on: str = None,
+    read_type: Optional[str] = None,
+    columns: Optional[List[str]] = None,
+    excluding_columns: Optional[List[str]] = None,
+    filepath_column: Optional[str] = None,
+    streaming: Optional[str] = None,  # actually bool
+    fetch: Optional[int] = None,
+    join: Optional[str] = None,
+    on: Optional[str] = None,
+    left_on: Optional[str] = None,
+    right_on: Optional[str] = None,
     suffix: str = "_right",
     validate: str = "m:m",
-    head: int = None,
-    tail: int = None,
-    sample: int = None,
-    method: str = None,
-    write_type: str = None,
-    write_path: str = None,
+    head: Optional[int] = None,
+    tail: Optional[int] = None,
+    sample: Optional[int] = None,
+    method: Optional[str] = None,
+    write_type: Optional[str] = None,
+    write_path: Optional[str] = None,
     **kwargs,
 ):
     """Read and transform tabular files using polars."""
@@ -154,7 +153,7 @@ def polars(
     df = activate(df, fetch, streaming_flag)
 
     if not isinstance(df, pl.DataFrame):
-        text = "{}".format(df)
+        text = f"{df}"
         if write_path:
             Path(write_path).write_text(text)
         else:
@@ -163,7 +162,7 @@ def polars(
 
     if _write_type == "markdown":
 
-        def write_func(write_path: str = None):
+        def write_func(write_path: Optional[str] = None):
             from io import StringIO
 
             import pandas as pd

@@ -2,6 +2,7 @@ import os
 import sys
 from collections import Counter
 from pathlib import Path
+from typing import Optional
 
 from .utils import upath
 
@@ -10,7 +11,7 @@ def ll(
     *paths: str,
     depth: int = 1,
     glob: str = "**/*",
-    type: str = None,
+    type: Optional[str] = None,
     file_glob: str = "**/*",
     number_limit: int = 100,
     sort_paths: str = "asc",
@@ -102,32 +103,34 @@ def _get_stat(
                     for i in range(extension_most_common)
                 }
 
-            d = dict(path=str(dir_path) + (os.sep if dir_path.is_dir() else ""))
+            d = {"path": str(dir_path) + (os.sep if dir_path.is_dir() else "")}
 
-            num_files = "{:,}".format(num_files)
+            num_files = f"{num_files:,}"
 
             if divisor:
                 total_size = round(total_size * divisor)
-                total_size = "~ {:,}".format(total_size)
-                max_size = ">= {:,}".format(max_size)
+                total_size = f"~ {total_size:,}"
+                max_size = f">= {max_size:,}"
             else:
-                total_size = "{:,}".format(total_size)
-                max_size = "{:,}".format(max_size)
+                total_size = f"{total_size:,}"
+                max_size = f"{max_size:,}"
 
             if type == "file":
-                d.update(dict(size=total_size))
+                d.update({"size": total_size})
             else:
                 d.update(
-                    dict(
-                        files=num_files,
-                        total_size=total_size,
-                        max_size=max_size,
-                        # latest_mtime=latest_mtime,
-                    )
+                    {
+                        "files": num_files,
+                        "total_size": total_size,
+                        "max_size": max_size,
+                        # "latest_mtime": latest_mtime,
+                    },
                 )
                 d.update(common_ext_dict)
 
             return d
+        return None
+    return None
 
 
 def _output_stat(stat_ls):
@@ -143,7 +146,7 @@ def _output_stat(stat_ls):
             df = pd.DataFrame(stat_ls)
             md = df.to_markdown(index=False, colalign=colalign_ls)
             sys.stdout.write(str(md) + "\n")
-        except:
+        except Exception:
             import json
 
             sys.stdout.write(json.dumps(stat_ls, indent=2) + "\n")
