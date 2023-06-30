@@ -72,81 +72,76 @@ def _get_stat(
     if not path_ls:
         return None
 
-    if True:
-        if True:
-            num_files = len(path_ls)
+    num_files = len(path_ls)
 
-            divisor = None
-            if num_files > number_limit:
-                divisor = num_files / number_limit
+    divisor = None
+    if num_files > number_limit:
+        divisor = num_files / number_limit
 
-            path_ls = path_ls[:number_limit]
+    path_ls = path_ls[:number_limit]
 
-            size_ls = []
-            # mtime_ls = []
-            ext_ls = []
-            for p in path_ls:
-                st = os.stat(p)
-                size_ls.append(st.st_size)
-                # mtime_ls.append(st.st_mtime)
+    size_ls = []
+    # mtime_ls = []
+    ext_ls = []
+    for p in path_ls:
+        st = os.stat(p)
+        size_ls.append(st.st_size)
+        # mtime_ls.append(st.st_mtime)
 
-                ext = p.suffix
-                ext_ls.append(ext)
+        ext = p.suffix
+        ext_ls.append(ext)
 
-            total_size = sum(size_ls)
-            max_size = max(size_ls)
-            # latest_mtime = max(mtime_ls)
-            if extension_most_common:
-                common_ext_count_ls = Counter(ext_ls).most_common(extension_most_common)
-                common_ext_dict = {
-                    "ext_" + str(i + 1): common_ext_count_ls[i][0]
-                    for i in range(extension_most_common)
-                }
+    total_size = sum(size_ls)
+    max_size = max(size_ls)
+    # latest_mtime = max(mtime_ls)
+    if extension_most_common:
+        common_ext_count_ls = Counter(ext_ls).most_common(extension_most_common)
+        common_ext_dict = {
+            "ext_" + str(i + 1): common_ext_count_ls[i][0]
+            for i in range(extension_most_common)
+        }
 
-            d = {"path": str(dir_path) + (os.sep if dir_path.is_dir() else "")}
+    d = {"path": str(dir_path) + (os.sep if dir_path.is_dir() else "")}
 
-            num_files = f"{num_files:,}"
+    num_files = f"{num_files:,}"
 
-            if divisor:
-                total_size = round(total_size * divisor)
-                total_size = f"~ {total_size:,}"
-                max_size = f">= {max_size:,}"
-            else:
-                total_size = f"{total_size:,}"
-                max_size = f"{max_size:,}"
+    if divisor:
+        total_size = round(total_size * divisor)
+        total_size = f"~ {total_size:,}"
+        max_size = f">= {max_size:,}"
+    else:
+        total_size = f"{total_size:,}"
+        max_size = f"{max_size:,}"
 
-            if type == "file":
-                d.update({"size": total_size})
-            else:
-                d.update(
-                    {
-                        "files": num_files,
-                        "total_size": total_size,
-                        "max_size": max_size,
-                        # "latest_mtime": latest_mtime,
-                    },
-                )
-                d.update(common_ext_dict)
+    if type == "file":
+        d.update({"size": total_size})
+    else:
+        d.update(
+            {
+                "files": num_files,
+                "total_size": total_size,
+                "max_size": max_size,
+                # "latest_mtime": latest_mtime,
+            },
+        )
+        d.update(common_ext_dict)
 
-            return d
-        return None
-    return None
+    return d
 
 
 def _output_stat(stat_ls):
-    if True:
-        try:
-            import pandas as pd
+    try:
+        import pandas as pd
 
-            colalign_ls = None
-            if stat_ls:
-                colalign_ls = ["right"] * len(stat_ls[0])
-                colalign_ls[0] = "left"
+        colalign_ls = None
+        if stat_ls:
+            colalign_ls = ["right"] * len(stat_ls[0])
+            colalign_ls[0] = "left"
 
-            df = pd.DataFrame(stat_ls)
-            md = df.to_markdown(index=False, colalign=colalign_ls)
-            sys.stdout.write(str(md) + "\n")
-        except Exception:
-            import json
+        df = pd.DataFrame(stat_ls)
+        md = df.to_markdown(index=False, colalign=colalign_ls)
+        sys.stdout.write(str(md) + "\n")
+    except Exception:
+        import json
 
-            sys.stdout.write(json.dumps(stat_ls, indent=2) + "\n")
+        sys.stdout.write(json.dumps(stat_ls, indent=2) + "\n")
