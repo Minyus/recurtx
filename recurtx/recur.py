@@ -1,6 +1,7 @@
 import re
 import sys
 from pathlib import Path
+from typing import Any, List, Tuple
 
 from .utils import get_exception_msg, subprocess_run, upath
 
@@ -8,8 +9,8 @@ from .utils import get_exception_msg, subprocess_run, upath
 def recur(
     path: str,
     *scripts: str,
-    **kwargs: str,
-):
+    **kwargs: Any,
+) -> Tuple[List[str], List[str], str, bool]:
     glob = kwargs.pop("glob", "**/*")
     regex = kwargs.pop(
         "regex",
@@ -72,7 +73,7 @@ def under(
     path: str,
     *scripts: str,
     **kwargs: str,
-):
+) -> None:
     """Run any scripts for each file under a directory recursively."""
 
     path_ls, script_ls, replace_str, show_scripts = recur(
@@ -91,9 +92,11 @@ def under(
                     else script
                     for script in script_ls
                 ]
+
             if len(running_script_ls) == 1:
-                running_script_ls = running_script_ls[0]
-            subprocess_run(running_script_ls, show_scripts)
+                subprocess_run(running_script_ls[0], show_scripts)
+            else:
+                subprocess_run(running_script_ls, show_scripts)
         except Exception:
             msg = get_exception_msg()
             sys.stdout.write(msg)
@@ -104,7 +107,7 @@ def batch(
     path: str,
     *scripts: str,
     **kwargs: str,
-):
+) -> None:
     """Run any scripts for a batch of files in a directory recursively."""
 
     path_ls, script_ls, replace_str, show_scripts = recur(
@@ -113,21 +116,21 @@ def batch(
         **kwargs,
     )
 
-    if len(script_ls) == 1:
-        running_script_ls = script_ls[0]
-        if replace_str:
-            running_script_ls = running_script_ls.replace(
-                replace_str, " ".join(path_ls)
-            )
-    else:
-        running_script_ls = []
-        for script in script_ls:
-            if replace_str and (script == replace_str):
-                running_script_ls.extend(path_ls)
-            else:
-                running_script_ls.append(script)
     try:
-        subprocess_run(running_script_ls, show_scripts)
+        if len(script_ls) == 1:
+            running_script = script_ls[0]
+            if replace_str:
+                running_script = running_script.replace(replace_str, " ".join(path_ls))
+            subprocess_run(running_script, show_scripts)
+        else:
+            running_script_ls = []
+            for script in script_ls:
+                if replace_str and (script == replace_str):
+                    running_script_ls.extend(path_ls)
+                else:
+                    running_script_ls.append(script)
+
+            subprocess_run(running_script_ls, show_scripts)
     except Exception:
         msg = get_exception_msg()
         sys.stdout.write(msg)

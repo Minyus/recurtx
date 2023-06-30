@@ -2,7 +2,7 @@ import os
 import sys
 from collections import Counter
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 from .utils import upath
 
@@ -17,7 +17,7 @@ def ll(
     sort_paths: str = "asc",
     info: bool = True,
     extension_most_common: int = 1,
-):
+) -> None:
     """Compute statistics for the directory recursively."""
 
     paths = paths or (".",)
@@ -58,12 +58,12 @@ def ll(
 
 
 def _get_stat(
-    dir_path,
-    glob,
-    type,
-    number_limit,
-    extension_most_common,
-):
+    dir_path: Path,
+    glob: str,
+    type: Optional[str],
+    number_limit: int,
+    extension_most_common: int,
+) -> Optional[Dict]:
     if dir_path.is_dir():
         path_ls = [p for p in dir_path.glob(glob) if p.is_file()]
     else:
@@ -103,24 +103,24 @@ def _get_stat(
 
     d = {"path": str(dir_path) + (os.sep if dir_path.is_dir() else "")}
 
-    num_files = f"{num_files:,}"
+    _num_files = f"{num_files:,}"
 
     if divisor:
         total_size = round(total_size * divisor)
-        total_size = f"~ {total_size:,}"
-        max_size = f">= {max_size:,}"
+        _total_size = f"~ {total_size:,}"
+        _max_size = f">= {max_size:,}"
     else:
-        total_size = f"{total_size:,}"
-        max_size = f"{max_size:,}"
+        _total_size = f"{total_size:,}"
+        _max_size = f"{max_size:,}"
 
     if type == "file":
-        d.update({"size": total_size})
+        d.update({"size": _total_size})
     else:
         d.update(
             {
-                "files": num_files,
-                "total_size": total_size,
-                "max_size": max_size,
+                "files": _num_files,
+                "total_size": _total_size,
+                "max_size": _max_size,
                 # "latest_mtime": latest_mtime,
             },
         )
@@ -129,7 +129,7 @@ def _get_stat(
     return d
 
 
-def _output_stat(stat_ls):
+def _output_stat(stat_ls: List[Dict[str, Any]]) -> None:
     try:
         import pandas as pd
 

@@ -7,7 +7,7 @@ from .recur import batch, under
 from .search import find, search
 
 
-def main():
+def main() -> None:
     fire.Fire(
         {
             "ll": ll,
@@ -21,29 +21,29 @@ def main():
     )
 
 
-def xpandas():
+def xpandas() -> None:
     fire.Fire(pandas)
 
 
-def xpolars():
+def xpolars() -> None:
     fire.Fire(polars)
 
 
-def xbatch():
+def xbatch() -> None:
     fire.Fire(batch)
 
 
-def xunder():
+def xunder() -> None:
     fire.Fire(under)
 
 
-def xfind():
+def xfind() -> None:
     fire.Fire(find)
 
 
-def xsearch():
+def xsearch() -> None:
     fire.Fire(search)
 
 
-def xll():
+def xll() -> None:
     fire.Fire(ll)

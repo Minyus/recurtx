@@ -1,5 +1,7 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, List, Optional
+
+import polars as pl
 
 from .utils import infer_type, stdout_lines
 
@@ -19,10 +21,10 @@ TRUE_VALUES = {"", "True", "true", "T", "t", "1"}
 
 
 def activate(
-    df,
+    df: pl.LazyFrame,
     fetch: Optional[int] = None,
-    streaming: Optional[bool] = None,
-):
+    streaming: bool = False,
+) -> pl.DataFrame:
     return (
         df.fetch(n_rows=fetch, streaming=streaming)
         if fetch
@@ -50,8 +52,8 @@ def polars(
     method: Optional[str] = None,
     write_type: Optional[str] = None,
     write_path: Optional[str] = None,
-    **kwargs,
-):
+    **kwargs: Any,
+) -> None:
     """Read and transform tabular files using polars."""
 
     """Workaround for unexpected behavior of Fire"""
@@ -80,8 +82,6 @@ def polars(
     )
 
     streaming_flag = streaming in TRUE_VALUES
-
-    import polars as pl
 
     ls = []
     for path in paths:
@@ -117,7 +117,7 @@ def polars(
 
     if not ls:
         return
-    elif len(ls) == 1:
+    if len(ls) == 1:
         df = ls[0]
     elif join is not None:
         df = ls[0]
@@ -162,7 +162,7 @@ def polars(
 
     if _write_type == "markdown":
 
-        def write_func(write_path: Optional[str] = None):
+        def write_func(write_path: Optional[str] = None) -> Optional[str]:
             from io import StringIO
 
             import pandas as pd
@@ -178,5 +178,5 @@ def polars(
     if write_path:
         write_func(write_path)
     else:
-        text = write_func()
-        stdout_lines(text)
+        out_text = write_func()
+        stdout_lines(out_text)

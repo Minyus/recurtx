@@ -11,7 +11,7 @@ def run_search(
     wildcard: str = "*",
     separator: str = "/",
     verbose: int = 1,
-):
+) -> str:
     assert isinstance(separator, str), str(separator) + ": " + str(type(separator))
 
     if isinstance(target, (list, set, tuple)):
@@ -71,7 +71,7 @@ def search(
     wildcard: str = "*",
     separator: str = "/",
     verbose: int = 1,
-):
+) -> None:
     """Search a keyword, which may include wildcards, in the text file content, and optionally substitute (replace)."""
     _path = Path(path)
     try:
@@ -102,7 +102,7 @@ def find(
     wildcard: str = "*",
     separator: str = "/",
     verbose: int = 1,
-):
+) -> None:
     """Find a keyword, which may include wildcards, in the file path, and optionally substitute (replace)."""
 
     text = path

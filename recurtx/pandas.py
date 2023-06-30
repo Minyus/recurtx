@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 from .utils import infer_type, stdout_lines
 
@@ -55,8 +55,8 @@ def pandas(
     method: Optional[str] = None,
     write_type: Optional[str] = None,
     write_path: Optional[str] = None,
-    **kwargs,
-):
+    **kwargs: Any,
+) -> None:
     """Read and transform tabular files using pandas."""
     """Workaround for unexpected behavior of Fire"""
     kwargs.pop("package", None)
@@ -135,7 +135,7 @@ def pandas(
 
     if not ls:
         return
-    elif len(ls) == 1:
+    if len(ls) == 1:
         df = ls[0]
     elif merge is not None:
         df = ls[0]
@@ -219,7 +219,10 @@ def pandas(
 
     _write_func = getattr(df, "to_" + _write_type)
 
-    def write_func(write_path: Optional[str] = None, index=False):
+    def write_func(
+        write_path: Optional[str] = None,
+        index: bool = False,
+    ) -> Optional[str]:
         nonlocal _write_func, df
         try:
             if _write_type == "json":
@@ -236,7 +239,7 @@ def pandas(
             return _write_func(write_path)
 
     if write_path:
-        write_func(write_path, index=False)
+        write_func(write_path=write_path, index=False)
     else:
-        text = write_func(index=False)
-        stdout_lines(text)
+        out_text = write_func(write_path=None, index=False)
+        stdout_lines(out_text)

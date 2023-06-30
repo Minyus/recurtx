@@ -34,7 +34,9 @@ def subprocess_run(
     return subprocess.run(script, shell=shell)
 
 
-def stdout_lines(text: str) -> None:
+def stdout_lines(text: Optional[str]) -> None:
+    if not text:
+        return None
     if not text.endswith("\n"):
         text += "\n"
     sys.stdout.write(text)
