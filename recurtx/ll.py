@@ -119,7 +119,7 @@ def _get_stat(
             else:
                 d.update(
                     dict(
-                        num_files=num_files,
+                        files=num_files,
                         total_size=total_size,
                         max_size=max_size,
                         # latest_mtime=latest_mtime,
