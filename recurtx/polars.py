@@ -1,8 +1,6 @@
 from pathlib import Path
 from typing import Any, List, Optional
 
-import polars as pl
-
 from .utils import infer_format, stdout_lines
 
 DATA_TYPES = {
@@ -18,18 +16,6 @@ DATA_TYPES = {
 }
 
 TRUE_VALUES = {"", "True", "true", "T", "t", "1"}
-
-
-def activate(
-    df: pl.LazyFrame,
-    fetch: Optional[int] = None,
-    streaming: bool = False,
-) -> pl.DataFrame:
-    return (
-        df.fetch(n_rows=fetch, streaming=streaming)
-        if fetch
-        else df.collect(streaming=streaming)
-    )
 
 
 def polars(
@@ -84,6 +70,19 @@ def polars(
     )
 
     streaming_flag = streaming in TRUE_VALUES
+
+    import polars as pl
+
+    def activate(
+        df: pl.LazyFrame,
+        fetch: Optional[int] = None,
+        streaming: bool = False,
+    ) -> pl.DataFrame:
+        return (
+            df.fetch(n_rows=fetch, streaming=streaming)
+            if fetch
+            else df.collect(streaming=streaming)
+        )
 
     ls = []
     for path in paths:
