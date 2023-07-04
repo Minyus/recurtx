@@ -20,7 +20,7 @@ def recur(
         "regex",
         r"^(?!.*(\.git\/|__pycache__\/|\.ipynb_checkpoints\/|\.pytest_cache\/|\.vscode\/|\.idea\/|\.DS_Store)).*$",
     )
-    type = kwargs.pop("type", "file")
+    type = kwargs.pop("type", None)
     sort_paths = kwargs.pop("sort_paths", "asc")
     replace_str = kwargs.pop("replace_str", "@@")
     show_paths = kwargs.pop("show_paths", False)
@@ -59,7 +59,9 @@ def recur(
     if _path.is_file():
         path_ls = [str(_path)]
     else:
-        path_ls = [str(p) for p in _path.glob(glob) if getattr(p, "is_" + type)()]
+        path_ls = [
+            str(p) for p in _path.glob(glob) if (not type) or getattr(p, "is_" + type)()
+        ]
         if rx:
             path_ls = [p for p in path_ls if rx.match(p)]
         if sort_paths:
