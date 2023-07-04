@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 from typing import Any, List, Tuple
 
-from .utils import get_exception_msg, subprocess_run, upath
+from .utils import get_exception_msg, subprocess_run, to_glob, upath
 
 
 def recur(
@@ -12,6 +12,10 @@ def recur(
     **kwargs: Any,
 ) -> Tuple[List[str], List[str], str, bool]:
     glob = kwargs.pop("glob", "**/*")
+    depth = kwargs.pop("depth", None)
+
+    glob = to_glob(depth) or glob
+
     regex = kwargs.pop(
         "regex",
         r"^(?!.*(\.git\/|__pycache__\/|\.ipynb_checkpoints\/|\.pytest_cache\/|\.vscode\/|\.idea\/|\.DS_Store)).*$",

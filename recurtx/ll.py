@@ -4,7 +4,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from .utils import upath
+from .utils import to_glob, upath
 
 
 def ll(
@@ -22,8 +22,7 @@ def ll(
 
     paths = paths or (".",)
 
-    if depth:
-        glob = "".join(["*/"] * (depth - 1)) + "*"
+    glob = to_glob(depth) or glob
 
     stat_ls = []
 

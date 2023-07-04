@@ -66,3 +66,9 @@ def infer_format(
         if _format in supported_types:
             return _format
     return None
+
+
+def to_glob(depth: Optional[int] = None) -> Optional[str]:
+    if depth:
+        return "".join(["*/"] * (depth - 1)) + "*"
+    return None
