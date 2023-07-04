@@ -2,6 +2,8 @@ import sys
 from pathlib import Path
 from typing import List, Optional, Set, Tuple, Union
 
+from .utils import subprocess_run
+
 
 def run_search(
     text: str,
@@ -118,5 +120,7 @@ def find(
         verbose=verbose,
     )
 
-    if sub is not None:
-        _path.rename(text)
+    if (sub is not None) and _path.exists():
+        sub_path = Path(text)
+        sub_path.parent.mkdir(parents=True, exist_ok=True)
+        subprocess_run(["mv", str(_path), str(sub_path)], verbose=False)
