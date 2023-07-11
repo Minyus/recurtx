@@ -64,7 +64,10 @@ def _get_stat(
     extension_most_common: int,
 ) -> Optional[Dict]:
     if dir_path.is_dir():
-        path_ls = [p for p in dir_path.glob(glob) if p.is_file()]
+        try:
+            path_ls = [p for p in dir_path.glob(glob) if p.is_file()]
+        except PermissionError:
+            return None
     else:
         path_ls = [dir_path]
 
@@ -83,7 +86,10 @@ def _get_stat(
     # mtime_ls = []
     ext_ls = []
     for p in path_ls:
-        st = p.stat()
+        try:
+            st = p.stat()
+        except Exception:
+            continue
         size_ls.append(st.st_size)
         # mtime_ls.append(st.st_mtime)
 
@@ -93,6 +99,8 @@ def _get_stat(
     total_size = sum(size_ls)
     max_size = max(size_ls)
     # latest_mtime = max(mtime_ls)
+
+    common_ext_dict = {}
     if extension_most_common:
         common_ext_count_ls = Counter(ext_ls).most_common(extension_most_common)
         common_ext_dict = {
