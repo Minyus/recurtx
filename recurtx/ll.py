@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -11,6 +12,7 @@ def ll(
     *paths: str,
     depth: int = 1,
     glob: str = "**/*",
+    regex: str = r"^(?!.*(\.git\/|__pycache__\/|\.ipynb_checkpoints\/|\.pytest_cache\/|\.vscode\/|\.idea\/|\.DS_Store)).*$",
     type: Optional[str] = None,
     file_glob: str = "**/*",
     number_limit: int = 100,
@@ -24,6 +26,8 @@ def ll(
 
     glob = to_glob(depth) or glob
 
+    rx = re.compile(regex) if regex else None
+
     stat_ls = []
 
     for path in paths:
@@ -33,6 +37,9 @@ def ll(
             dir_path_ls = [p for p in (_path.glob(glob)) if getattr(p, "is_" + type)()]
         else:
             dir_path_ls = list(_path.glob(glob))
+
+        if rx:
+            dir_path_ls = [p for p in dir_path_ls if rx.match(str(p))]
 
         if sort_paths:
             assert isinstance(sort_paths, str), sort_paths
