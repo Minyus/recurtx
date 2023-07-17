@@ -11,10 +11,10 @@ from .utils import to_glob, upath
 def ll(
     *paths: str,
     depth: int = 1,
+    unit_glob: str = "**/*",
+    type: Optional[str] = None,
     glob: str = "**/*",
     regex: str = r"^(?!.*(\.git\/|__pycache__\/|\.ipynb_checkpoints\/|\.pytest_cache\/|\.vscode\/|\.idea\/|\.DS_Store)).*$",
-    type: Optional[str] = None,
-    file_glob: str = "**/*",
     number_limit: int = 100,
     sort_paths: str = "asc",
     info: bool = True,
@@ -24,9 +24,7 @@ def ll(
 
     paths = paths or (".",)
 
-    glob = to_glob(depth) or glob
-
-    rx = re.compile(regex) if regex else None
+    unit_glob = to_glob(depth) or unit_glob
 
     stat_ls = []
 
@@ -34,12 +32,11 @@ def ll(
         _path = Path(upath(path))
 
         if type:
-            dir_path_ls = [p for p in (_path.glob(glob)) if getattr(p, "is_" + type)()]
+            dir_path_ls = [
+                p for p in (_path.glob(unit_glob)) if getattr(p, "is_" + type)()
+            ]
         else:
-            dir_path_ls = list(_path.glob(glob))
-
-        if rx:
-            dir_path_ls = [p for p in dir_path_ls if rx.match(str(p))]
+            dir_path_ls = list(_path.glob(unit_glob))
 
         if sort_paths:
             assert isinstance(sort_paths, str), sort_paths
@@ -49,7 +46,8 @@ def ll(
             for dir_path in dir_path_ls:
                 d = _get_stat(
                     dir_path=dir_path,
-                    glob=file_glob,
+                    glob=glob,
+                    regex=regex,
                     type=type,
                     number_limit=number_limit,
                     extension_most_common=extension_most_common,
@@ -66,10 +64,12 @@ def ll(
 def _get_stat(
     dir_path: Path,
     glob: str,
+    regex: Optional[str],
     type: Optional[str],
     number_limit: int,
     extension_most_common: int,
 ) -> Optional[Dict]:
+    rx = re.compile(regex) if regex else None
     if dir_path.is_dir():
         try:
             path_ls = [p for p in dir_path.glob(glob) if p.is_file()]
@@ -77,6 +77,9 @@ def _get_stat(
             return None
     else:
         path_ls = [dir_path]
+
+    if rx:
+        path_ls = [p for p in path_ls if rx.match(str(p))]
 
     if not path_ls:
         return None
