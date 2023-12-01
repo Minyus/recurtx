@@ -13,7 +13,7 @@ def run_search(
     wildcard: str = "*",
     separator: str = "/",
     verbose: int = 1,
-    context: bool = False,
+    context: Optional[int] = None,
 ) -> str:
     assert isinstance(separator, str), str(separator) + ": " + str(type(separator))
 
@@ -56,17 +56,19 @@ def run_search(
                     replacing = text[start_index:end_index]
                     replacing_ls.append(replacing)
                 if verbose >= 1:
-                    if context:
-                        line_start_index = text.rfind("\n", 0, start_index)
-                        line_start_index += 1
-                        line_end_index = text.find("\n", end_index)
-                        if line_end_index == -1:
-                            line_end_index = None
+                    if context is not None:
+                        n_lines = context + 1
+                        pre_context = "\n".join(
+                            text[0:start_index].rsplit("\n", n_lines)[-n_lines:]
+                        )
+                        post_context = "\n".join(
+                            text[end_index:].split("\n", n_lines)[:n_lines]
+                        )
                     else:
-                        line_start_index = start_index
-                        line_end_index = end_index
+                        pre_context = ""
+                        post_context = ""
                     sys.stdout.write(
-                        f"{path} [{start_index}:{end_index}]\n{text[line_start_index:line_end_index]}\n\n",
+                        f">> {path} [{start_index}:{end_index}]\n{pre_context}{text[start_index:end_index]}{post_context}\n\n",
                     )
             else:
                 break
@@ -83,7 +85,7 @@ def search(
     wildcard: str = "*",
     separator: str = "/",
     verbose: int = 1,
-    context: bool = True,
+    context: Optional[int] = 1,
 ) -> None:
     """Search a keyword, which may include wildcards, in the text file content, and optionally substitute (replace)."""
     _path = Path(path)
