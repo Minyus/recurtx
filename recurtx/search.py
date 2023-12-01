@@ -4,6 +4,8 @@ from typing import List, Optional, Set, Tuple, Union
 
 from .utils import subprocess_run
 
+from importlib.util import find_spec
+
 
 def run_search(
     text: str,
@@ -14,6 +16,7 @@ def run_search(
     separator: str = "/",
     verbose: int = 1,
     context: Optional[int] = None,
+    plain: bool = False,
 ) -> str:
     assert isinstance(separator, str), str(separator) + ": " + str(type(separator))
 
@@ -67,9 +70,22 @@ def run_search(
                     else:
                         pre_context = ""
                         post_context = ""
-                    sys.stdout.write(
-                        f">> {path} [{start_index}:{end_index}]\n{pre_context}{text[start_index:end_index]}{post_context}\n\n",
-                    )
+                    title = f">> {path} [{start_index}:{end_index}]"
+                    target = text[start_index:end_index]
+                    if (not find_spec("rich")) or plain:
+                        print(title)
+                        print(pre_context, end="")
+                        print(target, end="")
+                        print(post_context)
+                    else:
+                        from rich.console import Console
+
+                        rc = Console()
+
+                        rc.print(title)
+                        rc.print(pre_context, end="")
+                        rc.print(target, style="bold red", end="")
+                        rc.print(post_context)
             else:
                 break
         for replacing in list(set(replacing_ls)):
@@ -86,6 +102,7 @@ def search(
     separator: str = "/",
     verbose: int = 1,
     context: Optional[int] = 1,
+    plain: bool = False,
 ) -> None:
     """Search a keyword, which may include wildcards, in the text file content, and optionally substitute (replace)."""
     _path = Path(path)
@@ -105,6 +122,7 @@ def search(
         separator=separator,
         verbose=verbose,
         context=context,
+        plain=plain,
     )
 
     if sub is not None:
@@ -118,6 +136,7 @@ def find(
     wildcard: str = "*",
     separator: str = "/",
     verbose: int = 1,
+    plain: bool = False,
 ) -> None:
     """Find a keyword, which may include wildcards, in the file path, and optionally substitute (replace)."""
 
@@ -132,6 +151,7 @@ def find(
         wildcard=wildcard,
         separator=separator,
         verbose=verbose,
+        plain=plain,
     )
 
     if (sub is not None) and _path.exists():
