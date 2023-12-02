@@ -4,26 +4,40 @@
 [![PyPI version](https://badge.fury.io/py/recurtx.svg)](https://badge.fury.io/py/recurtx)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/Minyus/recurtx/blob/main/LICENSE)
 
-CLI to transform text files recursively
+CLI to recursively search and transform text files in xargs style
+
+## Background
+
+This tool was developed as an simpler alternative to the following CLI tools.
+
+- `xargs` to repeat simialr to for-loop
+- `find` to find file paths
+- `grep` to search text
+- `sed` to modify text
+- [`csvkit`](https://csvkit.readthedocs.io/en/latest/) to search (and modify) text in csv files
+- [`spyql`](https://spyql.readthedocs.io/) to search (and modify) text in csv files
+- [`clickhouse-local`](https://clickhouse.com/docs/en/operations/utilities/clickhouse-local) to search (and modify) text in csv files
+
+This tool is quicker to write although execution might be slower depending on the amount of your text data.
 
 ## Install
 
-### [Option 1] Install from the PyPI
+Prerequisite: Python 3 (3.8 or later recommended)
 
-Caveat: an old version could be installed.
+### [Option 1] Install from PyPI
 
 ```
 pip install recurtx
 ```
 
-### [Option 2] Install with editable option
+### [Option 2] Install from source code
 
-This is recommended if you want to use the latest version and/or modify the source code.
+This is recommended only if you want to modify the source code.
 
 ```bash
 git clone https://github.com/Minyus/recurtx.git
 cd recurtx
-pip install -e .
+python setup.py develop
 ```
 
 ## Wrapper Commands
@@ -150,11 +164,17 @@ xunder directory_foo xsearch keyword_bar --sub keyword_baz
 #### Description
 
 ```
+NOTES
+    You can also use flags syntax for POSITIONAL ARGUMENTS
+
 NAME
-    xsearch
+    xsearch - Search a keyword, which may include wildcards, in the text file content, and optionally substitute (replace).
 
 SYNOPSIS
     xsearch TARGET PATH <flags>
+
+DESCRIPTION
+    Search a keyword, which may include wildcards, in the text file content, and optionally substitute (replace).
 
 POSITIONAL ARGUMENTS
     TARGET
@@ -163,15 +183,24 @@ POSITIONAL ARGUMENTS
         Type: str
 
 FLAGS
-    -s, --sub=SUB
-        Type: Optional[str]
+    --sub=SUB
+        Type: Optional[typing.Unio...
         Default: None
     -w, --wildcard=WILDCARD
         Type: str
         Default: '*'
+    --separator=SEPARATOR
+        Type: str
+        Default: '/'
     -v, --verbose=VERBOSE
         Type: int
         Default: 1
+    -c, --context=CONTEXT
+        Type: typing.Union[int, NoneType]
+        Default: 1
+    -p, --plain=PLAIN
+        Type: bool
+        Default: False
 
 NOTES
     You can also use flags syntax for POSITIONAL ARGUMENTS
