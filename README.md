@@ -8,15 +8,19 @@ CLI to recursively search and transform text files in xargs style
 
 ## Background
 
-This tool was developed as an simpler alternative to the following CLI tools.
+This tool was developed as an simpler (partial) alternative to the following CLI tools.
 
-- `xargs` to repeat simialr to for-loop
-- `find` to find file paths
+- `xargs` to repeat similar to for-loop
+- `find` to recursively find file paths
+- `tree` to recursively check file paths
 - `grep` to search text
 - `sed` to modify text
+- `du` to check disk usage
 - [`csvkit`](https://csvkit.readthedocs.io/en/latest/) to search (and modify) text in csv files
 - [`spyql`](https://spyql.readthedocs.io/) to search (and modify) text in csv files
-- [`clickhouse-local`](https://clickhouse.com/docs/en/operations/utilities/clickhouse-local) to search (and modify) text in csv files
+- [`clickhouse-local`](https://clickhouse.com/docs/en/operations/utilities/clickhouse-local) 
+- [`polars-cli`](https://github.com/pola-rs/polars-cli) to search text in csv files
+- [`csvlens`](https://github.com/YS-L/csvlens) to view csv files
 
 This tool is quicker to write although execution might be slower depending on the amount of your text data.
 
@@ -252,6 +256,72 @@ FLAGS
 
 NOTES
     You can also use flags syntax for POSITIONAL ARGUMENTS
+```
+
+### xll
+
+Alternative to `ls -lah` and `du`.
+Show approximate total size and max size in Bytes to respond quickly in default while it takes time to run `du` in a big directory including many files.
+Show number of files and the most common file extention(s) as well.
+
+#### Examples
+
+Run under `directory_foo` non-recursively (up to depth 1):
+
+```
+xll directory_foo
+```
+
+Run under `directory_foo` recursively up to depth 2:
+
+```
+xll -d 2 directory_foo
+```
+
+#### Description
+
+```
+NAME
+    xll - Compute statistics for the directory recursively.
+
+SYNOPSIS
+    xll <flags> [PATHS]...
+
+DESCRIPTION
+    Compute statistics for the directory recursively.
+
+POSITIONAL ARGUMENTS
+    PATHS
+        Type: str
+
+FLAGS
+    -d, --depth=DEPTH
+        Type: int
+        Default: 1
+    -u, --unit_glob=UNIT_GLOB
+        Type: str
+        Default: '**/*'
+    -t, --type=TYPE
+        Type: Optional[typing.Unio...
+        Default: None
+    -g, --glob=GLOB
+        Type: str
+        Default: '**/*'
+    -r, --regex=REGEX
+        Type: str
+        Default: '^(?!.*(\\.git\\/|__pycache__\\/|\\.ipynb_checkpoints\\/|\\....
+    -n, --number_limit=NUMBER_LIMIT
+        Type: int
+        Default: 100
+    -s, --sort_paths=SORT_PATHS
+        Type: str
+        Default: 'asc'
+    -i, --info=INFO
+        Type: bool
+        Default: True
+    -e, --extension_most_common=EXTENSION_MOST_COMMON
+        Type: int
+        Default: 1
 ```
 
 ### xpandas
