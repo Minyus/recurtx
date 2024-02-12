@@ -105,6 +105,10 @@ def search(
     plain: bool = False,
 ) -> None:
     """Search a keyword, which may include wildcards, in the text file content, and optionally substitute (replace)."""
+    target = str(target)
+    path = str(path)
+    sub = str(sub) if sub is not None else sub
+
     _path = Path(path)
     try:
         text = _path.read_text()
@@ -139,6 +143,9 @@ def find(
     plain: bool = False,
 ) -> None:
     """Find a keyword, which may include wildcards, in the file path, and optionally substitute (replace)."""
+    target = str(target)
+    path = str(path)
+    sub = str(sub) if sub is not None else sub
 
     text = path
     _path = Path(path)
@@ -154,7 +161,7 @@ def find(
         plain=plain,
     )
 
-    if (sub is not None) and _path.exists():
+    if (sub is not None) and _path.exists() and (text != path):
         sub_path = Path(text)
         sub_path.parent.mkdir(parents=True, exist_ok=True)
         subprocess_run(["mv", str(_path), str(sub_path)], verbose=False)
