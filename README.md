@@ -8,19 +8,21 @@ CLI to recursively search and transform text files in xargs style
 
 ## Background
 
-This tool was developed as an simpler (partial) alternative to the following CLI tools.
+This tool was developed as an opinionated (partial) alternative to the following CLI tools.
 
 - `xargs` to repeat similar to for-loop
 - `find` to recursively find file paths
 - `tree` to recursively check file paths
 - `grep` to search text
+- [`ag`](https://github.com/ggreer/the_silver_searcher) to search text
 - `sed` to modify text
 - `du` to check disk usage
 - [`csvkit`](https://csvkit.readthedocs.io/en/latest/) to search (and modify) text in csv files
 - [`spyql`](https://spyql.readthedocs.io/) to search (and modify) text in csv files
-- [`clickhouse-local`](https://clickhouse.com/docs/en/operations/utilities/clickhouse-local) 
+- [`clickhouse-local`](https://clickhouse.com/docs/en/operations/utilities/clickhouse-local)
 - [`polars-cli`](https://github.com/pola-rs/polars-cli) to search text in csv files
 - [`csvlens`](https://github.com/YS-L/csvlens) to view csv files
+- [`rich-cli`](https://github.com/Textualize/rich-cli) to view csv files
 
 This tool is quicker to write although execution might be slower depending on the amount of your text data.
 
@@ -58,13 +60,14 @@ Run `wc -l {FILEPATH}` for each file under `directory_foo` recursively:
 xunder directory_foo "wc -l"
 ```
 
-Quoting for the script can be omitted for most cases. 
+Quoting for the script can be omitted for most cases.
 
 ```
 xunder directory_foo wc -l
 ```
 
 Caveat: int, float, tuple, list, dict could be formatted unexpectedly (by `fire` package), for example:
+
 - ` 00 ` (recognized as int by Python) will be converted to ` 0 ` while ` "00" ` (recognized as str by Python) will be kept as is
 
 #### Description
@@ -329,29 +332,31 @@ FLAGS
 Read and transform tabular data using pandas.
 
 Regarding options, see the documents for `pandas.read_xxx` such as:
+
 - [pandas.read_csv](https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html)
 
 Data types supported by pandas (not all were tested):
-  - "pickle"
-  - "table"
-  - "csv"
-  - "fwf"
-  - "clipboard"
-  - "excel"
-  - "json"
-  - "html"
-  - "xml"
-  - "hdf"
-  - "feather"
-  - "parquet"
-  - "orc"
-  - "sas"
-  - "spss"
-  - "sql_table"
-  - "sql_query"
-  - "sql"
-  - "gbq"
-  - "stata"
+
+- "pickle"
+- "table"
+- "csv"
+- "fwf"
+- "clipboard"
+- "excel"
+- "json"
+- "html"
+- "xml"
+- "hdf"
+- "feather"
+- "parquet"
+- "orc"
+- "sas"
+- "spss"
+- "sql_table"
+- "sql_query"
+- "sql"
+- "gbq"
+- "stata"
 
 #### Install dependency
 
@@ -372,18 +377,20 @@ xbatch directory_foo xpandas
 Read and transform tabular data using polars.
 
 Regarding options, see the documents for `polars.scan_xxx` (or `polars.read_xxx` if scan function is not available), such as:
+
 - [polars.scan_csv](https://pola-rs.github.io/polars/py-polars/html/reference/api/polars.scan_csv.html)
 
 Data types supported by polars (not all were tested):
-  - "csv"
-  - "ipc"
-  - "parquet"
-  - "database"
-  - "json"
-  - "ndjson"
-  - "avro"
-  - "excel"
-  - "delta"
+
+- "csv"
+- "ipc"
+- "parquet"
+- "database"
+- "json"
+- "ndjson"
+- "avro"
+- "excel"
+- "delta"
 
 #### Install dependency
 
@@ -401,4 +408,4 @@ xbatch directory_foo xpolars
 
 ## Dependency to enable CLI
 
-- https://github.com/google/python-fire
+- <https://github.com/google/python-fire>
