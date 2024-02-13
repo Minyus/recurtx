@@ -6,16 +6,23 @@
 
 CLI to recursively search and transform text files in xargs style
 
+## Key features
+
+- search and substitute (replace) text in file contents or file paths in place
+- installable without sudo (using pip)
+
 ## Background
 
 This tool was developed as an opinionated (partial) alternative to the following CLI tools.
 
-- `xargs` to repeat similar to for-loop
 - `find` to recursively find file paths
-- `tree` to recursively check file paths
+- `fd` to recursively find file paths with .gitignore (if available, `fd` is internally used by `xunder` and `xbatch`)
 - `grep` to search text
+- [`ripgrep`](https://github.com/BurntSushi/ripgrep) to search text
 - [`ag`](https://github.com/ggreer/the_silver_searcher) to search text
 - `sed` to modify text
+- `xargs` to repeat similar to for-loop
+- `tree` to recursively check file paths
 - `du` to check disk usage
 - [`csvkit`](https://csvkit.readthedocs.io/en/latest/) to search (and modify) text in csv files
 - [`spyql`](https://spyql.readthedocs.io/) to search (and modify) text in csv files
