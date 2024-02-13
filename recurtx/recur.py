@@ -89,7 +89,7 @@ def recur(
 
     if show_paths:
         sys.stdout.write(
-            "[Searching files]\n" + str("\n".join(["    " + p for p in path_ls]) + "\n")
+            "[Searching files]" + str("\n".join(["    " + p for p in path_ls]) + "\n")
         )
     return path_ls, script_ls, replace_str, show_scripts
 
