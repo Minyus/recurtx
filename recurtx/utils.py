@@ -34,6 +34,21 @@ def subprocess_run(
     return subprocess.run(script, shell=shell)
 
 
+def subprocess_run_stdout(
+    script: Union[str, List[str]],
+    verbose: bool = True,
+) -> str:
+    if verbose:
+        sys.stdout.write(r">>> " + str(script) + "\n")
+
+        sleep(0.2)
+
+    assert script, script
+    shell = isinstance(script, str)
+    result = subprocess.run(script, shell=shell, stdout=subprocess.PIPE)
+    return result.stdout.decode()
+
+
 def stdout_lines(text: Optional[str]) -> None:
     if not text:
         return None

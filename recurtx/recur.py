@@ -3,7 +3,13 @@ import sys
 from pathlib import Path
 from typing import Any, List, Tuple
 
-from .utils import get_exception_msg, subprocess_run, to_glob, upath
+from .utils import (
+    get_exception_msg,
+    subprocess_run,
+    subprocess_run_stdout,
+    to_glob,
+    upath,
+)
 
 
 def recur(
@@ -11,16 +17,15 @@ def recur(
     *scripts: str,
     **kwargs: Any,
 ) -> Tuple[List[str], List[str], str, bool]:
-    glob = kwargs.pop("glob", "**/*")
+    avoid_fd = kwargs.pop("avoid_fd", None)
+    glob = kwargs.pop("glob", None)
     depth = kwargs.pop("depth", None)
-
-    glob = to_glob(depth) or glob
 
     regex = kwargs.pop(
         "regex",
         r"^(?!.*(\.git\/|__pycache__\/|\.ipynb_checkpoints\/|\.pytest_cache\/|\.vscode\/|\.idea\/|\.DS_Store)).*$",
     )
-    type = kwargs.pop("type", None)
+    type = kwargs.pop("type", "f")
     sort_paths = kwargs.pop("sort_paths", "asc")
     replace_str = kwargs.pop("replace_str", "@@")
     show_paths = kwargs.pop("show_paths", False)
@@ -59,9 +64,25 @@ def recur(
     if _path.is_file():
         path_ls = [str(_path)]
     else:
-        path_ls = [
-            str(p) for p in _path.glob(glob) if (not type) or getattr(p, "is_" + type)()
-        ]
+        if avoid_fd:
+            path_ls = None
+        else:
+            path_ls = subprocess_run_stdout(
+                "fd "
+                + ("" if not type else f"--type {type}")
+                + ("" if depth is None else f"--max-depth {depth}")
+                + ("" if glob is None else f"--glob {glob}")
+                + f" '' {path}",
+                verbose=False,
+            ).split("\n")
+        if not path_ls:
+            glob = to_glob(depth) or glob or "**/*"
+            path_ls = [
+                str(p)
+                for p in _path.glob(glob)
+                if (not type)
+                or getattr(p, "is_" + type.replace("f", "file").replace("d", "dir"))()
+            ]
         if rx:
             path_ls = [p for p in path_ls if rx.match(p)]
         if sort_paths:
