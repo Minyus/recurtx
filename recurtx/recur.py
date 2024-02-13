@@ -18,20 +18,17 @@ def recur(
     **kwargs: Any,
 ) -> Tuple[List[str], List[str], str, bool]:
     avoid_fd = kwargs.pop("avoid_fd", None)
-    glob = kwargs.pop("glob", None)
+    type = kwargs.pop("type", "f")
     depth = kwargs.pop("depth", None)
-
+    glob = kwargs.pop("glob", None)
     regex = kwargs.pop(
         "regex",
         r"^(?!.*(\.git\/|__pycache__\/|\.ipynb_checkpoints\/|\.pytest_cache\/|\.vscode\/|\.idea\/|\.DS_Store)).*$",
     )
-    type = kwargs.pop("type", "f")
     sort_paths = kwargs.pop("sort_paths", "asc")
     replace_str = kwargs.pop("replace_str", "@@")
     show_paths = kwargs.pop("show_paths", False)
     show_scripts = kwargs.pop("show_scripts", False)
-
-    rx = re.compile(regex) if regex else None
 
     script_ls = list(scripts)
     if len(kwargs) and len(script_ls) == 1:
@@ -83,7 +80,8 @@ def recur(
                 if (not type)
                 or getattr(p, "is_" + type.replace("f", "file").replace("d", "dir"))()
             ]
-        if rx:
+        if regex:
+            rx = re.compile(regex)
             path_ls = [p for p in path_ls if rx.match(p)]
         if sort_paths:
             assert isinstance(sort_paths, str), sort_paths
