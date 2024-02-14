@@ -16,9 +16,9 @@ CLI to recursively search and transform text files in xargs style
 This tool was developed as an opinionated (partial) alternative to the following CLI tools.
 
 - `find` to recursively find file paths
-- `fd` to recursively find file paths with .gitignore (if available, `fd` is internally used by `xunder` and `xbatch`)
+- `fd` to recursively find file paths respecting .gitignore (`fd` is internally used by `xunder` and `xbatch` in default if installed)
 - `grep` to search text
-- [`ripgrep`](https://github.com/BurntSushi/ripgrep) to search text
+- [`rg`](https://github.com/BurntSushi/ripgrep) to search text
 - [`ag`](https://github.com/ggreer/the_silver_searcher) to search text
 - `sed` to modify text
 - `xargs` to repeat similar to for-loop
