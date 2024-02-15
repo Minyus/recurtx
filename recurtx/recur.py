@@ -63,7 +63,13 @@ def recur(
         path_ls = [str(_path)]
     else:
         if avoid_fd:
-            path_ls = None
+            glob = to_glob(depth) or glob or "**/*"
+            path_ls = [
+                str(p)
+                for p in _path.glob(glob)
+                if (not type)
+                or getattr(p, "is_" + type.replace("f", "file").replace("d", "dir"))()
+            ]
         else:
             path_ls = (
                 subprocess_run_stdout(
@@ -78,14 +84,6 @@ def recur(
                 .strip()
                 .split("\n")
             )
-        if not path_ls:
-            glob = to_glob(depth) or glob or "**/*"
-            path_ls = [
-                str(p)
-                for p in _path.glob(glob)
-                if (not type)
-                or getattr(p, "is_" + type.replace("f", "file").replace("d", "dir"))()
-            ]
         if regex:
             rx = re.compile(regex)
             path_ls = [p for p in path_ls if rx.match(p)]
