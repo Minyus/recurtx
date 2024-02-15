@@ -63,7 +63,7 @@ def recur(
         path_ls = [str(_path)]
     else:
         if avoid_fd:
-            glob = to_glob(depth) or glob or "**/*"
+            glob = glob or (to_glob(depth) if depth > 0 else "**/*")
             path_ls = [
                 str(p)
                 for p in _path.glob(glob)
