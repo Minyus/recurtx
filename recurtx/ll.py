@@ -11,7 +11,7 @@ from .utils import to_glob, upath
 def ll(
     *paths: str,
     depth: int = 1,
-    unit_glob: str = "**/*",
+    unit_glob: Optional[str] = None,
     type: Optional[str] = None,
     glob: str = "**/*",
     regex: str = r"^(?!.*(\.git\/|__pycache__\/|\.ipynb_checkpoints\/|\.pytest_cache\/|\.vscode\/|\.idea\/|\.DS_Store)).*$",
@@ -24,7 +24,7 @@ def ll(
 
     paths = paths or (".",)
 
-    unit_glob = to_glob(depth) or unit_glob
+    unit_glob = unit_glob or (to_glob(depth) if depth > 0 else "**/*")
 
     stat_ls = []
 
@@ -33,7 +33,9 @@ def ll(
 
         if type:
             dir_path_ls = [
-                p for p in (_path.glob(unit_glob)) if getattr(p, "is_" + type)()
+                p
+                for p in (_path.glob(unit_glob))
+                if getattr(p, "is_" + type.replace("f", "file").replace("d", "dir"))()
             ]
         else:
             dir_path_ls = list(_path.glob(unit_glob))
