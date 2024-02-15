@@ -21,7 +21,7 @@ def recur(
     type = kwargs.pop("type", "f")
     depth = kwargs.pop("depth", None)
     glob = kwargs.pop("glob", None)
-    absolute_path = kwargs.pop("absolute_path", True)
+    absolute_path = kwargs.pop("absolute_path", False)
     regex = kwargs.pop(
         "regex",
         r"^(?!.*(\.git\/|__pycache__\/|\.ipynb_checkpoints\/|\.pytest_cache\/|\.vscode\/|\.idea\/|\.DS_Store)).*$",
@@ -65,15 +65,19 @@ def recur(
         if avoid_fd:
             path_ls = None
         else:
-            path_ls = subprocess_run_stdout(
-                "fd "
-                + ("" if not type else f"--type {type} ")
-                + ("" if depth is None else f"--max-depth {depth} ")
-                + ("" if glob is None else f"--glob {glob} ")
-                + ("" if not absolute_path else f"--absolute-path ")
-                + f"'' {path}",
-                verbose=True,
-            ).split("\n")
+            path_ls = (
+                subprocess_run_stdout(
+                    "fd "
+                    + ("" if not absolute_path else f"--absolute-path ")
+                    + ("" if not type else f"--type {type} ")
+                    + ("" if depth is None else f"--max-depth {depth} ")
+                    + ("''" if glob is None else f"--glob {glob} ")
+                    + f"{path}",
+                    verbose=False,
+                )
+                .strip()
+                .split("\n")
+            )
         if not path_ls:
             glob = to_glob(depth) or glob or "**/*"
             path_ls = [
