@@ -57,7 +57,12 @@ def ll(
                 if d:
                     stat_ls.append(d)
         else:
-            sys.stdout.write("\n".join([str(p) for p in dir_path_ls]) + "\n")
+            sys.stdout.write(
+                "\n".join(
+                    [str(p) + (os.sep if p.is_dir() else "") for p in dir_path_ls]
+                )
+                + "\n"
+            )
 
     if info:
         _output_stat(stat_ls)
