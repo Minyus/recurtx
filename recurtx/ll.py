@@ -15,7 +15,7 @@ def ll(
     type: Optional[str] = None,
     glob: str = "**/*",
     regex: str = r"^(?!.*(\.git\/|__pycache__\/|\.ipynb_checkpoints\/|\.pytest_cache\/|\.vscode\/|\.idea\/|\.DS_Store)).*$",
-    number_limit: int = 100,
+    number_limit: int = 10,
     sort_paths: str = "asc",
     info: bool = False,
     extension_most_common: int = 1,
