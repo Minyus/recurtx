@@ -75,18 +75,19 @@ def _get_stat(
     if dir_path.is_dir():
         try:
             path_ls = [p for p in dir_path.glob(glob) if p.is_file()]
+            if rx:
+                path_ls = [p for p in path_ls if rx.match(str(p))]
+            num_files = len(path_ls)
+            _num_files = f"{num_files:,}"
         except PermissionError:
             return None
     else:
         path_ls = [dir_path]
-
-    if rx:
-        path_ls = [p for p in path_ls if rx.match(str(p))]
+        num_files = len(path_ls)
+        _num_files = ""
 
     if not path_ls:
         return None
-
-    num_files = len(path_ls)
 
     divisor = None
     if num_files > number_limit:
@@ -121,8 +122,6 @@ def _get_stat(
         }
 
     d = {"path": str(dir_path) + (os.sep if dir_path.is_dir() else "")}
-
-    _num_files = f"{num_files:,}"
 
     if divisor:
         total_size = round(total_size * divisor)
