@@ -40,4 +40,4 @@ ignore = [
     "S602",
     "S603",
 ]
-target-version = "py37"
+target-version = "py38"
