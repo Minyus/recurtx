@@ -242,4 +242,4 @@ def pandas(
     if output_path:
         write_func(output_path=output_path, index=False)
     else:
-        print(df)
+        print(f">> {', '.join(paths)}\n{df}")

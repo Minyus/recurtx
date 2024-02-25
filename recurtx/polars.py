@@ -179,4 +179,4 @@ def polars(
     if output_path:
         write_func(output_path)
     else:
-        print(df)
+        print(f">> {', '.join(paths)}\n{df}")
