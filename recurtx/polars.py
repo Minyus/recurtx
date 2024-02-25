@@ -179,5 +179,4 @@ def polars(
     if output_path:
         write_func(output_path)
     else:
-        out_text = write_func()
-        stdout_lines(out_text)
+        print(df)

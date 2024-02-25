@@ -242,5 +242,4 @@ def pandas(
     if output_path:
         write_func(output_path=output_path, index=False)
     else:
-        out_text = write_func(output_path=None, index=False)
-        stdout_lines(out_text)
+        print(df)
