@@ -67,7 +67,7 @@ def recur(
         path_ls = [str(_path)]
     else:
         if avoid_fd or (
-            not subprocess_run_stdout(["fd", "--version"], verbose=False)
+            not subprocess_run_stdout("fd --version", verbose=False)
             .strip()
             .startswith("fd")
         ):
