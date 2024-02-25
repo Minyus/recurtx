@@ -23,6 +23,7 @@ def upath(
 def subprocess_run(
     script: Union[str, List[str]],
     verbose: bool = True,
+    capture_output: bool = False,
 ) -> subprocess.CompletedProcess:
     if verbose:
         sys.stdout.write(r">>> " + str(script) + "\n")
@@ -31,7 +32,7 @@ def subprocess_run(
 
     assert script, script
     shell = isinstance(script, str)
-    return subprocess.run(script, shell=shell)
+    return subprocess.run(script, shell=shell, capture_output=capture_output)
 
 
 def subprocess_run_stdout(

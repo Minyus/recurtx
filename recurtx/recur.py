@@ -62,7 +62,12 @@ def recur(
     if _path.is_file():
         path_ls = [str(_path)]
     else:
-        if avoid_fd:
+        if (
+            avoid_fd
+            or subprocess_run(
+                ["fd", "--version"], verbose=False, capture_output=True
+            ).returncode
+        ):
             glob = glob or (to_glob(depth) if depth else "**/*")
             path_ls = [
                 str(p)
