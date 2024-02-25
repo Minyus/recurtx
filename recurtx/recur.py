@@ -31,6 +31,10 @@ def recur(
     show_paths = kwargs.pop("show_paths", False)
     show_scripts = kwargs.pop("show_scripts", False)
 
+    assert not isinstance(avoid_fd, str), f"avoid_fd: {avoid_fd}"
+    assert not isinstance(show_paths, str), f"show_paths: {show_paths}"
+    assert not isinstance(show_scripts, str), f"show_scripts: {show_scripts}"
+
     script_ls = list(scripts)
     if len(kwargs) and len(script_ls) == 1:
         script_ls = script_ls[0].split(" ")
@@ -62,11 +66,10 @@ def recur(
     if _path.is_file():
         path_ls = [str(_path)]
     else:
-        if (
-            avoid_fd
-            or subprocess_run(
-                ["fd", "--version"], verbose=False, capture_output=True
-            ).returncode
+        if avoid_fd or (
+            not subprocess_run_stdout(["fd", "--version"], verbose=False)
+            .strip()
+            .startswith("fd")
         ):
             glob = glob or (to_glob(depth) if depth else "**/*")
             path_ls = [
