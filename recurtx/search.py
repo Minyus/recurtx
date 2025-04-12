@@ -18,6 +18,8 @@ def run_search(
     context: Optional[int] = None,
     plain: bool = False,
 ) -> str:
+    if verbose >= 4:
+        print(">>>>", locals())
     assert isinstance(separator, str), str(separator) + ": " + str(type(separator))
 
     if isinstance(target, (list, set, tuple)):
@@ -53,7 +55,7 @@ def run_search(
                     index = index + len(target_ss)
                 else:
                     break
-            if start_index and (index >= 0):
+            if start_index is not None and (index >= 0):
                 end_index = index
                 if _sub is not None:
                     replacing = text[start_index:end_index]
