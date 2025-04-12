@@ -35,7 +35,7 @@ def recur(
     assert not isinstance(show_paths, str), f"show_paths: {show_paths}"
     assert not isinstance(show_scripts, str), f"show_scripts: {show_scripts}"
 
-    script_ls = list(scripts)
+    script_ls = [str(script) for script in scripts]
     if len(kwargs) and len(script_ls) == 1:
         script_ls = script_ls[0].split(" ")
     for k, v in kwargs.items():
@@ -124,9 +124,11 @@ def under(
             running_script_ls = script_ls
             if replace_str:
                 running_script_ls = [
-                    script.replace(replace_str, p)
-                    if isinstance(script, str)
-                    else script
+                    (
+                        script.replace(replace_str, p)
+                        if isinstance(script, str)
+                        else script
+                    )
                     for script in script_ls
                 ]
 
